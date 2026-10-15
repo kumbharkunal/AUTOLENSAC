@@ -57,18 +57,18 @@ export default async function Image() {
             flexDirection: "column",
             justifyContent: "space-between",
             padding: "64px 72px",
-            width: 760,
+            width: 980,
             height: "100%",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", fontFamily: "Geist", fontSize: 44, letterSpacing: -1.8 }}>
             <span style={{ color: "#0B1438" }}>Aut</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LENS_MARK} alt="" width={36} height={36} style={{ margin: "10px 1px 0" }} />
-            <span style={{ color: "#1A47D1", marginLeft: -2 }}>Lens</span>
+            <img src={LENS_MARK} alt="" width={34} height={34} style={{ margin: "12px 0 0 1px" }} />
+            <span style={{ color: "#1A47D1", marginLeft: -3 }}>Lens</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", flexWrap: "wrap", fontFamily: "Cormorant", fontSize: 92, lineHeight: 1.0, color: "#121A36", letterSpacing: -2 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", fontFamily: "Cormorant", fontSize: 86, lineHeight: 1.0, color: "#121A36", letterSpacing: -2 }}>
               <span>Don&apos;t buy a vehicle&nbsp;</span>
               <span>without&nbsp;</span>
               <span style={{ fontStyle: "italic", color: "#1A47D1" }}>PDI.</span>
@@ -77,9 +77,9 @@ export default async function Image() {
               Expert computerized car & bike diagnosis before delivery.
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", fontFamily: "Geist", fontSize: 18, letterSpacing: 3, color: "#4F5468" }}>
-            <span>PRE-DELIVERY INSPECTION | CONSULTATION</span>
-            <span style={{ marginLeft: 28, letterSpacing: 0.5, color: "#121A36" }}>{site.contact.phoneDisplay}</span>
+          <div style={{ display: "flex", alignItems: "center", fontFamily: "Geist", fontSize: 17, color: "#4F5468" }}>
+            <span style={{ letterSpacing: 2.6, whiteSpace: "nowrap" }}>PRE-DELIVERY INSPECTION | CONSULTATION</span>
+            <span style={{ marginLeft: 32, whiteSpace: "nowrap", color: "#121A36" }}>{site.contact.phoneDisplay}</span>
           </div>
         </div>
       </div>

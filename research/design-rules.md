@@ -131,27 +131,34 @@ Rules:
 | Moment | Library | Trigger | Effect | Reduced motion |
 |---|---|---|---|---|
 | Intro (first visit per session) | CSS | page load | lens mark focus-pull at the hero focal point, then hands off to the aperture (≤ 1.1 s, skippable) | skipped |
-| Hero | CSS + GSAP | load / scroll | aperture veil opens, image settles 1.06 → 1, masked line rise, chips spring in and float, scrubbed parallax | static, no veil |
-| Navbar | Motion | scroll direction | hide on scroll down, show on scroll up, shrink after hero, active indicator slides | instant |
+| Hero | CSS + GSAP | load / scroll | aperture veil opens (compositor-only scale), image settles 1.08 → 1, masked line rise, chips spring in and float, scrubbed parallax | static, no veil |
+| Navbar | CSS transitions + scroll store | scroll direction | hide on scroll down, show on scroll up, shrink after hero, active indicator slides | instant |
 | Section H2s | GSAP SplitText (`lines`, `mask`, `autoSplit`) | enter | lines rise 0.9 s, 80 ms stagger | static |
-| Statement | GSAP SplitText (`words`) | scrub | words sharpen 14 % → 100 % ink | full ink |
+| Statement | GSAP SplitText (`words`) | scrub | words sharpen from soft grey (AA) to ink | full ink |
 | Models marquee | CSS | perpetual | 60 s loop; pause button; paused offscreen | static wrapped list |
 | Reveals (problem, services, why, Instagram) | CSS + shared IntersectionObserver | enter | fade up 24 px, staggered | visible |
 | Under the lens | GSAP pin + scrub (≥ 1024 px) / state (mobile) | scroll / swipe / click | loupe travels between hotspots, list highlights, final "ready" seal | click-select, no pin |
 | Process | GSAP scrub | scroll | line draws, nodes focus | full line |
 | Report | GSAP timeline (once) | enter | scan sweep, rows print, checks draw, highlighter wipes | static |
-| FAQ | Motion | click | height + opacity | instant |
+| FAQ | CSS (grid-rows) | click | height + opacity | instant |
 | Final CTA | GSAP scrub | scroll | aperture rings scale | static |
-| WhatsApp FAB | Motion | after hero | spring in | instant |
+| WhatsApp FAB | CSS (spring easing) | after hero | spring in | instant |
+| Mobile menu | Motion (AnimatePresence) | tap | sheet springs in, links stagger, backdrop fades | instant |
 | Cursor lens | GSAP `quickTo` | pointer (fine, hover) | ring follows, grows over interactive targets | off |
 
 **Engineering rules**
-- Lenis (`autoRaf: false`) drives scrolling via `gsap.ticker`. `lenis.on('scroll', ScrollTrigger.update)`, `lagSmoothing(0)`. Native touch scrolling (`syncTouch: false`). Lenis isn't created under reduced motion. It stops while the mobile menu is open.
-- GSAP plugins are registered once in `lib/gsap.ts`. Components use `useGSAP({ scope })`.
-- Section setups run through `lib/motion/scheduler.ts`: queued in page order, run in idle time, then `ScrollTrigger.sort()` + `refresh()`. They refresh again after fonts load and after code-split sections mount.
-- `ScrollTrigger.config({ ignoreMobileResize: true })`. No markers in production.
-- GSAP and Motion never animate the same element.
-- Budgets: ≤ 1 pinned section, 0 WebGL scenes, no animated `filter`, `will-change` only while animating.
+- **Motion stays off the critical path.** The hero (intro, aperture veil, line reveals, chips) is pure CSS, so it plays before any JavaScript arrives. Everything else waits for a "motion ready" switch (`lib/motion/ready.ts`), which flips on the first input (pointer, scroll, key, touch) or 2.5s after the page has loaded. Only then are these mounted, as code-split `next/dynamic` components:
+  - Lenis, GSAP, ScrollTrigger and the cursor lens (`components/motion/MotionEngine.tsx`)
+  - the scroll scenes (`components/motion/scene-effects.tsx`)
+  - the inspector's pin (`InspectorPin.tsx`)
+  - the Motion mobile menu (`components/layout/MobileMenu.tsx`)
+- Lenis (`autoRaf: false`) is driven by `gsap.ticker`; `lenis.on('scroll', ScrollTrigger.update)`, `lagSmoothing(0)`. Touch keeps native scrolling (`syncTouch: false`). Lenis isn't created under reduced motion, and it stops while the mobile menu is open.
+- GSAP plugins are registered once in `lib/gsap.ts`. Every scene uses `useGSAP({ scope })` with `contextSafe`, gated by `gsap.matchMedia()`.
+- Section setups run through `lib/motion/scheduler.ts`: queued in page order, run in idle time, then `ScrollTrigger.sort()` + `refresh()`. They refresh again after fonts load.
+- `ScrollTrigger.config({ ignoreMobileResize: true })`. No markers in production. The navbar reads scroll position from the engine (`lib/motion/scroll-store.ts`); there are no raw scroll listeners.
+- **Motion vs CSS.** Motion (`motion/react`) powers the mobile menu sheet: AnimatePresence, spring physics, staggered links. Simple state changes use CSS transitions with the same easing tokens: navbar hide/shrink, hamburger morph, FAQ height, WhatsApp button. GSAP and Motion never animate the same element.
+- Budgets: 1 pinned section, 0 WebGL scenes, no animated `filter`, `will-change` only on the veil and loupe.
+- **Measured:** Lighthouse mobile (placeholder images) gave Performance 91, Accessibility 100, Best Practices 100, SEO 100. CLS 0.002, TBT ≤ 80ms.
 
 **The 3 wow moments + 1 clever detail**
 1. Hero lens-focus reveal.
