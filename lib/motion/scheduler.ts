@@ -1,28 +1,30 @@
-import { ScrollTrigger } from "@/lib/gsap";
-
 /**
- * Runs scroll-animation setups in idle time, in page order, so hydration stays cheap
- * (lower Total Blocking Time) and ScrollTriggers refresh top-to-bottom. After each
- * batch, triggers are sorted by position and refreshed so pin spacing is always correct.
+ * Runs scroll-animation setups in idle time, in page order, so they never compete with
+ * hydration (lower Total Blocking Time) and ScrollTriggers refresh top-to-bottom. After each
+ * batch the registered refresher (ScrollTrigger.sort + refresh, set by the motion engine) runs,
+ * so pin spacing is always correct. No GSAP import here, to keep this module tiny.
  */
 type Task = { order: number; run: () => void };
 
 const queue: Task[] = [];
 let pending = false;
+let refresher: (() => void) | null = null;
 
 type IdleDeadlineLike = { timeRemaining: () => number };
-const requestIdle: (cb: (deadline: IdleDeadlineLike) => void) => void =
-  typeof window !== "undefined" && "requestIdleCallback" in window
-    ? (cb) => window.requestIdleCallback(cb, { timeout: 700 })
-    : (cb) => window.setTimeout(() => cb({ timeRemaining: () => 12 }), 32);
+const requestIdle = (cb: (deadline: IdleDeadlineLike) => void) => {
+  if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(cb, { timeout: 700 });
+  else globalThis.setTimeout(() => cb({ timeRemaining: () => 12 }), 32);
+};
+
+/** Registered once by the motion engine. */
+export function setScrollRefresher(fn: () => void) {
+  refresher = fn;
+}
 
 let refreshTimer: number | undefined;
 export function refreshScroll() {
   window.clearTimeout(refreshTimer);
-  refreshTimer = window.setTimeout(() => {
-    ScrollTrigger.sort();
-    ScrollTrigger.refresh();
-  }, 60);
+  refreshTimer = window.setTimeout(() => refresher?.(), 60);
 }
 
 function flush(deadline: IdleDeadlineLike) {

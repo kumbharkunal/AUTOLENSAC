@@ -1,13 +1,12 @@
 "use client";
 
-import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { WhatsAppIcon } from "@/components/brand/SocialIcons";
+import { cn } from "@/lib/cn";
 
-/** Mobile-only WhatsApp button: appears after the hero, steps aside for the final CTA. */
+/** Mobile-only WhatsApp button: springs in after the hero, steps aside for the final CTA. */
 export function FloatingWhatsApp({ href, label }: { href: string; label: string }) {
   const [visible, setVisible] = useState(false);
-  const reduce = useReducedMotion();
 
   useEffect(() => {
     const hero = document.getElementById("top");
@@ -26,24 +25,21 @@ export function FloatingWhatsApp({ href, label }: { href: string; label: string 
   }, []);
 
   return (
-    <AnimatePresence>
-      {visible ? (
-        <m.a
-          key="fab"
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={label}
-          data-menu-inert
-          className="fab fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[45] grid h-14 w-14 place-items-center rounded-full shadow-lift ring-[3px] ring-ivory md:hidden"
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.6, opacity: 0 }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 30 }}
-        >
-          <WhatsAppIcon tone="badge" className="h-14 w-14" />
-        </m.a>
-      ) : null}
-    </AnimatePresence>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      aria-hidden={!visible || undefined}
+      tabIndex={visible ? undefined : -1}
+      data-menu-inert
+      className={cn(
+        "fab fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[45] grid h-14 w-14 place-items-center rounded-full shadow-lift ring-[3px] ring-ivory md:hidden",
+        "transition-[opacity,scale] duration-500 ease-spring",
+        visible ? "scale-100 opacity-100" : "pointer-events-none scale-75 opacity-0",
+      )}
+    >
+      <WhatsAppIcon tone="badge" className="h-14 w-14" />
+    </a>
   );
 }

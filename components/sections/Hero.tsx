@@ -173,7 +173,7 @@ export function Hero() {
                 href={telHref}
                 variant="secondary"
                 badge="phone"
-                ariaLabel={`Call ${contact.phoneDisplay}`}
+                ariaLabel={`${cta.call} ${contact.phoneShort}`}
                 className="bg-ivory/40"
               >
                 <span className="sm:hidden">{cta.call}</span>

@@ -53,7 +53,7 @@ export function FinalCta() {
           <ButtonLink href={whatsappHref()} variant="dark-primary" badge="whatsapp" external>
             {cta.book}
           </ButtonLink>
-          <ButtonLink href={telHref} variant="dark-secondary" badge="phone" ariaLabel={`Call ${contact.phoneDisplay}`}>
+          <ButtonLink href={telHref} variant="dark-secondary" badge="phone">
             {cta.call} {contact.phoneShort}
           </ButtonLink>
           <ButtonLink

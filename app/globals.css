@@ -33,12 +33,6 @@
   --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
-@property --aperture {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: -20vmax;
-}
-
 /* ───────────────────────── Fluid type ───────────────────────── */
 
 @utility text-h2 {
@@ -100,6 +94,9 @@
 @layer base {
   :root {
     --hero-delay: 0.12s;
+    /* Statement words before they come into focus: still >= 3:1 on cream (large text). */
+    --statement-dim: #828596;
+    --statement-dim-accent: #6f82cf;
   }
 
   html {
@@ -243,20 +240,25 @@ html.intro-skip .intro {
   }
 }
 
-/* The defocus veil: the photo's own tiny blur placeholder, opened by a circular aperture. */
+/*
+ * The defocus veil: the photo's tiny blur placeholder, upscaled by the browser (a soft, nearly
+ * free-to-raster defocus), with a small sharp "pupil" at the focal point. The aperture opens by scaling the veil out from that point, a
+ * compositor-only transform, so there is no per-frame paint while it runs.
+ */
 .hero-veil {
   --ax: var(--fx-m);
   --ay: var(--fy-m);
   position: absolute;
   inset: 0;
   z-index: 1;
-  overflow: hidden;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent var(--aperture), #000 calc(var(--aperture) + 18vmax));
-  mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent var(--aperture), #000 calc(var(--aperture) + 18vmax));
+  transform-origin: var(--ax) var(--ay);
+  -webkit-mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent 0, transparent 2.2vmax, #000 7vmax);
+  mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent 0, transparent 2.2vmax, #000 7vmax);
+  will-change: transform, opacity;
   animation:
-    aperture 1.3s var(--ease-lens) var(--hero-delay) both,
-    veil-out 0.35s linear calc(var(--hero-delay) + 1.15s) both;
+    aperture 1.35s var(--ease-lens) var(--hero-delay) both,
+    veil-out 0.4s linear calc(var(--hero-delay) + 1s) both;
 }
 
 @media (min-width: 768px) {
@@ -268,18 +270,17 @@ html.intro-skip .intro {
 
 .hero-veil__img {
   position: absolute;
-  inset: -8%;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(26px) saturate(1.06);
 }
 
 @keyframes aperture {
   from {
-    --aperture: -20vmax;
+    transform: scale(1);
   }
   to {
-    --aperture: 160vmax;
+    transform: scale(26);
   }
 }
 
@@ -433,8 +434,8 @@ html.js [data-reveal][data-revealed] {
   z-index: 2;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   translate: -50% -50%;
   border-radius: 9999px;
 }
@@ -697,6 +698,8 @@ html[data-menu-open] .fab {
     padding-inline: 1rem;
   }
   .marquee__list {
+    flex-shrink: 1;
+    min-width: 0;
     flex-wrap: wrap;
     justify-content: center;
     row-gap: 1.25rem;

@@ -7,13 +7,14 @@ import { BrandGradients } from "@/components/brand/SocialIcons";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { CursorLens } from "@/components/motion/CursorLens";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 import { site } from "@/content/site";
 import { siteUrl, telHref, whatsappHref } from "@/lib/links";
 
+// Static 500 weight (the only display weight used): about 30 KB lighter than the variable font.
 const display = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: "500",
   style: ["normal", "italic"],
   variable: "--font-cormorant",
   display: "swap",
@@ -81,7 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <MotionRoot>
+        <MotionRoot cursor={site.features.cursor}>
           <Navbar
             links={site.nav}
             logo={<Logo />}
@@ -94,7 +95,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <Footer />
           <FloatingWhatsApp href={whatsappHref()} label={`${site.cta.book} on WhatsApp`} />
-          {site.features.cursor ? <CursorLens /> : null}
         </MotionRoot>
         <div className="grain" aria-hidden="true" />
       </body>

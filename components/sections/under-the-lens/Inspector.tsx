@@ -1,17 +1,20 @@
 "use client";
 
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
+import dynamic from "next/dynamic";
 import Image, { type StaticImageData } from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LensMark } from "@/components/brand/LensMark";
 import { SplitHeading } from "@/components/motion/scenes";
-import { Icon } from "@/components/ui/Icon";
 import { Container, Eyebrow } from "@/components/ui/primitives";
-import type { Checkpoint } from "@/content/site";
+import type { Checkpoint, IconName } from "@/content/site";
 import { cn } from "@/lib/cn";
-import { gsap, MQ_DESKTOP_MOTION, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { getLenis } from "@/lib/motion/lenis-store";
-import { refreshScroll, scheduleMotion } from "@/lib/motion/scheduler";
+import { useMotionReady } from "@/lib/motion/ready";
+import type { InspectorEngine, PinApi } from "./InspectorPin";
+
+// The desktop pinned timeline (GSAP + ScrollTrigger) loads on demand, once motion is unlocked.
+const InspectorPin = dynamic(() => import("./InspectorPin").then((mod) => mod.InspectorPin), { ssr: false });
 
 type Kind = {
   id: "car" | "bike";
@@ -29,20 +32,24 @@ type Props = {
   ready: string;
   kinds: readonly Kind[];
   images: { car: StaticImageData; bike: StaticImageData };
+  /** Icons rendered on the server (keeps the icon library out of the client bundle). */
+  icons: Partial<Record<IconName, React.ReactNode>>;
 };
 
 const ZOOM = 2.2;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+const easeInOutCubic = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
 /**
  * "Under the lens": a real magnifying loupe travels across the vehicle, checkpoint by checkpoint.
  * One DOM, two drivers:
- * - desktop with motion: a pinned, scrubbed GSAP timeline (the page's only pin)
- * - mobile, tablet or reduced motion: a swipeable card rail and clickable list/hotspots
+ * - desktop with motion: a pinned, scrubbed GSAP timeline (InspectorPin, loaded on demand)
+ * - mobile, tablet or reduced motion: a swipeable card rail and clickable list/hotspots,
+ *   gliding the lens with a tiny requestAnimationFrame tween (no library needed)
  * Everything the loupe does is transform-only; React only renders structure and text.
  */
-export function Inspector({ id, eyebrow, title, body, status, ready, kinds, images }: Props) {
+export function Inspector({ id, eyebrow, title, body, status, ready, kinds, images, icons }: Props) {
   const [kindId, setKindId] = useState<Kind["id"]>("car");
   const kind = kinds.find((k) => k.id === kindId) ?? kinds[0];
   const count = kind.checkpoints.length;
@@ -57,9 +64,14 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
   const railRef = useRef<HTMLUListElement>(null);
 
   // Engine state lives outside React: t = position along the checkpoints, f = final full focus.
-  const engine = useRef({ t: 0, f: 0, active: -1, mode: "interactive" as "interactive" | "pinned" });
+  const engine = useRef<InspectorEngine>({ t: 0, f: 0, active: -1, mode: "interactive" });
   const pointsRef = useRef<readonly Checkpoint[]>(kind.checkpoints);
-  const timelineRef = useRef<{ tl: gsap.core.Timeline; st: ScrollTrigger } | null>(null);
+  const pinApiRef = useRef<PinApi | null>(null);
+  const tweenRef = useRef<number | null>(null);
+  const motionReady = useMotionReady();
+  const onPinned = useCallback((api: PinApi | null) => {
+    pinApiRef.current = api;
+  }, []);
 
   const applyActive = useCallback((index: number) => {
     const root = sectionRef.current;
@@ -122,28 +134,43 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
   /** Interactive driver: glide the lens to a checkpoint. The last one opens into full focus. */
   const glideTo = useCallback(
     (index: number) => {
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      gsap.to(engine.current, {
-        t: index,
-        f: index === pointsRef.current.length - 1 ? 1 : 0,
-        duration: reduce ? 0 : 0.85,
-        ease: "power3.inOut",
-        overwrite: true,
-        onUpdate: render,
-        onComplete: render,
-      });
+      const state = engine.current;
+      const to = { t: index, f: index === pointsRef.current.length - 1 ? 1 : 0 };
+      if (tweenRef.current !== null) cancelAnimationFrame(tweenRef.current);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        state.t = to.t;
+        state.f = to.f;
+        render();
+        return;
+      }
+      const from = { t: state.t, f: state.f };
+      const start = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - start) / 850);
+        const e = easeInOutCubic(p);
+        state.t = lerp(from.t, to.t, e);
+        state.f = lerp(from.f, to.f, e);
+        render();
+        tweenRef.current = p < 1 ? requestAnimationFrame(step) : null;
+      };
+      tweenRef.current = requestAnimationFrame(step);
     },
     [render],
+  );
+
+  useEffect(
+    () => () => {
+      if (tweenRef.current !== null) cancelAnimationFrame(tweenRef.current);
+    },
+    [],
   );
 
   /** Select a checkpoint from the list, a hotspot or the rail buttons. */
   const select = useCallback(
     (index: number) => {
-      const pinned = timelineRef.current;
+      const pinned = pinApiRef.current;
       if (engine.current.mode === "pinned" && pinned) {
-        const { tl, st } = pinned;
-        const time = tl.labels[`cp${index}`] ?? 0;
-        const y = st.start + (st.end - st.start) * (time / tl.duration());
+        const y = pinned.scrollYFor(index);
         const lenis = getLenis();
         if (lenis) lenis.scrollTo(y, { duration: 1.1 });
         else window.scrollTo({ top: y, behavior: "smooth" });
@@ -194,50 +221,6 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
     rail.querySelectorAll("[data-index]").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [glideTo]);
-
-  // Desktop: pin the stage and scrub the inspection with the scroll.
-  useGSAP(
-    (_context, contextSafe) => {
-      const mm = gsap.matchMedia();
-      const setup = contextSafe!(() => {
-        mm.add(MQ_DESKTOP_MOTION, () => {
-          const section = sectionRef.current;
-          const pin = pinRef.current;
-          if (!section || !pin) return;
-          engine.current.mode = "pinned";
-          const n = pointsRef.current.length;
-          const tl = gsap.timeline({ defaults: { ease: "power2.inOut" }, onUpdate: render });
-          tl.set(engine.current, { t: 0, f: 0 }).addLabel("cp0").to({}, { duration: 0.4 });
-          for (let i = 1; i < n; i++) {
-            tl.to(engine.current, { t: i, duration: 1 }).addLabel(`cp${i}`).to({}, { duration: 0.45 });
-          }
-          tl.to(engine.current, { f: 1, duration: 1.1 }).to({}, { duration: 0.5 });
-          const st = ScrollTrigger.create({
-            animation: tl,
-            trigger: section,
-            start: "top top",
-            end: () => `+=${Math.round(window.innerHeight * 3.4)}`,
-            pin,
-            scrub: 0.6,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          });
-          timelineRef.current = { tl, st };
-          return () => {
-            timelineRef.current = null;
-            engine.current.mode = "interactive";
-            engine.current.t = 0;
-            engine.current.f = 0;
-            render();
-          };
-        });
-        refreshScroll();
-      });
-      scheduleMotion(60, setup);
-      return () => mm.revert();
-    },
-    { scope: sectionRef },
-  );
 
   // Dev helper: /?hotspots prints image coordinates on click, for calibrating real photos.
   useEffect(() => {
@@ -326,7 +309,7 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
                     className="lens-item group flex w-full items-start gap-4 rounded-2xl py-2.5 text-left text-ink/55 transition-colors duration-300 hover:text-ink"
                   >
                     <span className="lens-item__mark mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors duration-300">
-                      <Icon name={point.icon} className="h-4 w-4" weight="regular" />
+                      <span className="h-4 w-4">{icons[point.icon]}</span>
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-display text-[1.45rem] leading-tight font-medium">{point.title}</span>
@@ -425,7 +408,7 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="grid h-10 w-10 place-items-center rounded-full bg-lens/10 text-lens">
-                        <Icon name={point.icon} className="h-5 w-5" weight="regular" />
+                        <span className="h-5 w-5">{icons[point.icon]}</span>
                       </span>
                       <span className="rounded-full bg-lens/[0.08] px-2.5 py-1 font-mono text-[10.5px] tracking-[0.12em] text-lens uppercase">
                         {status}
@@ -461,6 +444,16 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
           </div>
         </Container>
       </div>
+      {motionReady ? (
+        <InspectorPin
+          sectionRef={sectionRef}
+          pinRef={pinRef}
+          engine={engine}
+          count={count}
+          render={render}
+          onPinned={onPinned}
+        />
+      ) : null}
     </section>
   );
 }

@@ -39,7 +39,6 @@ export function InstagramStrip() {
                 href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`${tile.category}: view on Instagram`}
                 className="group relative block aspect-square overflow-hidden rounded-[22px] bg-sand"
               >
                 {tile.kind === "image" ? (
@@ -59,6 +58,7 @@ export function InstagramStrip() {
                     </span>
                   </span>
                 )}
+                <span className="sr-only"> (opens Instagram)</span>
                 <span
                   aria-hidden="true"
                   className="absolute inset-0 grid place-items-center bg-navy/45 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"

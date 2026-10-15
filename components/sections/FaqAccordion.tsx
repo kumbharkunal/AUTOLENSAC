@@ -1,15 +1,14 @@
 "use client";
 
-import { m, useReducedMotion } from "motion/react";
 import { useId, useState } from "react";
+import { cn } from "@/lib/cn";
 
 /**
- * Accessible accordion. Answers stay in the DOM (good for search engines); closed panels are
- * collapsed to zero height and made inert so they can't be focused or read out.
+ * Accessible accordion. Answers stay in the DOM (good for search engines); closed panels collapse
+ * to zero height (CSS grid-rows transition) and are inert, so they can't be focused or read out.
  */
 export function FaqAccordion({ items }: { items: readonly { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(0);
-  const reduce = useReducedMotion();
   const baseId = useId();
 
   return (
@@ -37,27 +36,29 @@ export function FaqAccordion({ items }: { items: readonly { q: string; a: string
                   className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors duration-300 group-hover:border-lens/40"
                 >
                   <span className="absolute h-[1.5px] w-3.5 rounded-full bg-ink" />
-                  <m.span
-                    className="absolute h-3.5 w-[1.5px] rounded-full bg-ink"
-                    initial={false}
-                    animate={{ rotate: isOpen ? 90 : 0, opacity: isOpen ? 0 : 1 }}
-                    transition={reduce ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  <span
+                    className={cn(
+                      "absolute h-3.5 w-[1.5px] rounded-full bg-ink transition-[rotate,opacity] duration-500 ease-out",
+                      isOpen && "rotate-90 opacity-0",
+                    )}
                   />
                 </span>
               </button>
             </h3>
-            <m.div
+            <div
               id={panelId}
               role="region"
               aria-labelledby={buttonId}
               inert={!isOpen}
-              className="overflow-hidden"
-              initial={false}
-              animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className={cn(
+                "grid transition-[grid-template-rows,opacity] duration-500 ease-out",
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+              )}
             >
-              <p className="max-w-[62ch] pb-7 text-lead text-muted">{item.a}</p>
-            </m.div>
+              <div className="overflow-hidden">
+                <p className="max-w-[62ch] pb-7 text-lead text-muted">{item.a}</p>
+              </div>
+            </div>
           </li>
         );
       })}
