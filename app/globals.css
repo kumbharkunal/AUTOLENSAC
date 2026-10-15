@@ -1,26 +1,704 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ───────────────────────── Tokens (see research/design-rules.md) ───────────────────────── */
+
+@theme {
+  --color-cream: #f4ede2;
+  --color-ivory: #fbf8f2;
+  --color-sand: #e6dccb;
+  --color-ink: #121a36;
+  --color-muted: #5f6478;
+  --color-navy: #0b1438;
+  --color-lens: #1a47d1;
+  --color-lens-deep: #1338b0;
+  --color-lens-tint: #9db1f2;
+  --color-signal: #f2c230;
+  --color-wa: #25d366;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-lens: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --radius-card: 28px;
+  --radius-plate: 36px;
+
+  --shadow-soft: 0 1px 2px rgb(18 26 54 / 0.06);
+  --shadow-float: 0 12px 32px -16px rgb(18 26 54 / 0.28);
+  --shadow-lift: 0 40px 80px -32px rgb(18 26 54 / 0.35);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
+@property --aperture {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -20vmax;
+}
+
+/* ───────────────────────── Fluid type ───────────────────────── */
+
+@utility text-h2 {
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+@utility text-h3 {
+  font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2.125rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+@utility text-statement {
+  font-size: clamp(3rem, 0.9rem + 8.4vw, 8.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+@utility text-lead {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.6;
+}
+@utility text-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ───────────────────────── Surfaces ───────────────────────── */
+
+/* Web glassmorphism approximation (not Apple Liquid Glass). Solid fallback below. */
+@utility glass {
+  background-color: rgb(251 248 242 / 0.72);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgb(18 26 54 / 0.08);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.65),
+    0 10px 30px -14px rgb(18 26 54 / 0.3);
+}
+
+/* Dotted leader between a label and its value, like a printed report. */
+@utility leader {
+  flex: 1 1 auto;
+  min-width: 1.25rem;
+  height: 2px;
+  align-self: center;
+  background-image: radial-gradient(circle, currentColor 0.9px, transparent 1.1px);
+  background-size: 6px 2px;
+  background-repeat: repeat-x;
+  background-position: left center;
+  opacity: 0.32;
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --hero-delay: 0.12s;
+  }
+
+  html {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scrollbar-gutter: stable;
+  }
+
+  html.intro-play {
+    --hero-delay: 0.55s;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: rgb(26 71 209 / 0.16);
+    color: var(--color-ink);
+  }
+
+  :where(a, button, [role="button"], summary, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-lens);
+    outline-offset: 3px;
+  }
+
+  .on-navy :where(a, button):focus-visible {
+    outline-color: var(--color-ivory);
+  }
+
+  [id] {
+    scroll-margin-top: 96px;
+  }
+
+  em.accent,
+  .accent {
+    font-style: italic;
+    color: var(--color-lens);
+  }
+
+  .on-navy em.accent,
+  .on-navy .accent {
+    color: var(--color-lens-tint);
+  }
+
+  button {
+    cursor: pointer;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ───────────────────────── Grain ───────────────────────── */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.1 0 0 0 0 0.21 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ───────────────────────── Intro (first visit per session) ───────────────────────── */
+
+.intro {
+  display: none;
+}
+
+html.intro-play .intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: block;
+  background-color: var(--color-cream);
+  animation: intro-out 0.45s var(--ease-lens) 0.62s both;
+}
+
+html.intro-skip .intro {
+  display: none;
+}
+
+.intro__lens {
+  position: absolute;
+  left: var(--fx-m);
+  top: var(--fy-m);
+  width: 72px;
+  height: 72px;
+  translate: -50% -50%;
+  animation: intro-lens 1.05s var(--ease-out) both;
+}
+
+@media (min-width: 768px) {
+  .intro__lens {
+    left: var(--fx-d);
+    top: var(--fy-d);
+  }
+}
+
+@keyframes intro-lens {
+  0% {
+    opacity: 0;
+    scale: 1.7;
+  }
+  40% {
+    opacity: 1;
+  }
+  58% {
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+@keyframes intro-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ───────────────────────── Hero: lens focus reveal ───────────────────────── */
+
+.hero-media img {
+  animation: rack-focus 1.9s var(--ease-out) var(--hero-delay) both;
+}
+
+@keyframes rack-focus {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* The defocus veil: the photo's own tiny blur placeholder, opened by a circular aperture. */
+.hero-veil {
+  --ax: var(--fx-m);
+  --ay: var(--fy-m);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent var(--aperture), #000 calc(var(--aperture) + 18vmax));
+  mask-image: radial-gradient(circle at var(--ax) var(--ay), transparent var(--aperture), #000 calc(var(--aperture) + 18vmax));
+  animation:
+    aperture 1.3s var(--ease-lens) var(--hero-delay) both,
+    veil-out 0.35s linear calc(var(--hero-delay) + 1.15s) both;
+}
+
+@media (min-width: 768px) {
+  .hero-veil {
+    --ax: var(--fx-d);
+    --ay: var(--fy-d);
+  }
+}
+
+.hero-veil__img {
+  position: absolute;
+  inset: -8%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(26px) saturate(1.06);
+}
+
+@keyframes aperture {
+  from {
+    --aperture: -20vmax;
+  }
+  to {
+    --aperture: 160vmax;
+  }
+}
+
+@keyframes veil-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Authored headline lines, each rising out of its own mask. */
+.hero-line {
+  display: block;
+  overflow: clip;
+  padding: 0 0.12em 0.14em 0;
+  margin-bottom: -0.14em;
+}
+
+.hero-line > span {
+  display: block;
+  animation: line-rise 1.15s var(--ease-out) both;
+  animation-delay: calc(var(--hero-delay) + 0.32s + var(--i, 0) * 90ms);
+}
+
+@keyframes line-rise {
+  from {
+    transform: translate3d(0, 112%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-fade {
+  animation: fade-up 1s var(--ease-out) both;
+  animation-delay: calc(var(--hero-delay) + var(--d, 0.6s));
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+.hero-title--mobile {
+  font-size: clamp(2.5rem, calc((100vw - 64px) / 6.9), 3.6rem);
+}
+.hero-title--tablet {
+  font-size: clamp(3.5rem, calc((100vw - 120px) / 10.6), 5.6rem);
+}
+.hero-title--desktop {
+  font-size: clamp(3.4rem, 5vw, 6.4rem);
+}
+
+/* Report chips over the photograph. */
+.chip-surface {
+  background-color: rgb(251 248 242 / 0.9);
+  border: 1px solid rgb(18 26 54 / 0.08);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 14px 34px -16px rgb(18 26 54 / 0.4);
+}
+
+@media (min-width: 768px) {
+  .chip-surface {
+    background-color: rgb(251 248 242 / 0.7);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    backdrop-filter: blur(12px) saturate(1.4);
+  }
+}
+
+.chip-in {
+  animation: chip-in 1s var(--ease-spring) both;
+  animation-delay: calc(var(--hero-delay) + 1.05s + var(--i, 0) * 140ms);
+}
+
+.chip-float {
+  animation: chip-float 6.5s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i, 0) * -2.2s);
+}
+
+[data-hero-offscreen] .chip-float {
+  animation-play-state: paused;
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.94);
+  }
+}
+
+@keyframes chip-float {
+  from {
+    transform: translate3d(0, -4px, 0);
+  }
+  to {
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+/* ───────────────────────── Scroll reveals ───────────────────────── */
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 1.05s var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+html.js [data-reveal][data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+
+/* SplitText line masks: room for italic overhang and descenders. */
+.split-line-mask {
+  padding: 0 0.08em 0.14em;
+  margin: 0 -0.08em -0.14em;
+}
+
+/* ───────────────────────── Marquee ───────────────────────── */
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 70s linear infinite;
+}
+
+.marquee[data-paused="true"] .marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee[data-offscreen] .marquee__track {
+  animation-play-state: paused;
+}
+
+/* ───────────────────────── Under the lens ───────────────────────── */
+
+.lens-hotspot {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  translate: -50% -50%;
+  border-radius: 9999px;
+}
+
+.lens-hotspot::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background-color: var(--color-ivory);
+  box-shadow:
+    0 0 0 2px rgb(26 71 209 / 0.55),
+    0 4px 12px rgb(18 26 54 / 0.28);
+  transition:
+    transform 0.45s var(--ease-out),
+    background-color 0.3s ease;
+}
+
+.lens-hotspot::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-lens);
+  opacity: 0;
+}
+
+.lens-hotspot[data-done]::before {
+  background-color: var(--color-lens);
+}
+
+.lens-hotspot[data-active]::before {
+  background-color: var(--color-lens);
+  transform: scale(1.2);
+}
+
+.lens-hotspot[data-active]::after {
+  animation: hotspot-pulse 1.9s var(--ease-out) infinite;
+}
+
+@keyframes hotspot-pulse {
+  from {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.3);
+  }
+}
+
+.lens-loupe {
+  --ring: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: clamp(124px, 26%, 250px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  overflow: hidden;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  background-color: var(--color-cream);
+  box-shadow:
+    0 0 0 calc(3px * var(--ring)) rgb(251 248 242 / calc(0.95 * var(--ring))),
+    0 0 0 calc(4px * var(--ring)) rgb(18 26 54 / calc(0.14 * var(--ring))),
+    0 26px 50px -18px rgb(18 26 54 / calc(0.55 * var(--ring)));
+}
+
+/* Glass highlight + fine reticle, fading out as the lens opens into full focus. */
+.lens-loupe::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: var(--ring);
+  background:
+    radial-gradient(circle at 30% 26%, rgb(255 255 255 / 0.32), transparent 42%),
+    linear-gradient(rgb(251 248 242 / 0.55), rgb(251 248 242 / 0.55)) center / 18% 1px no-repeat,
+    linear-gradient(rgb(251 248 242 / 0.55), rgb(251 248 242 / 0.55)) center / 1px 18% no-repeat;
+}
+
+.lens-loupe__img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.lens-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.lens-seal {
+  opacity: 0;
+  transform: translate3d(-50%, 12px, 0) scale(0.96);
+  transition:
+    opacity 0.5s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+
+[data-ready] .lens-seal {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+
+[data-kind] .lens-photo {
+  transition: opacity 0.6s var(--ease-out);
+}
+
+[data-kind="car"] .lens-photo[data-for="bike"],
+[data-kind="bike"] .lens-photo[data-for="car"] {
+  opacity: 0;
+}
+
+.lens-item[data-active] {
+  color: var(--color-ink);
+}
+
+.lens-item[data-active] .lens-item__mark {
+  background-color: var(--color-lens);
+  border-color: var(--color-lens);
+  color: var(--color-ivory);
+}
+
+.lens-item[data-active] .lens-item__detail {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.lens-item__detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.5s var(--ease-out),
+    opacity 0.4s ease;
+}
+
+.lens-card[data-active] {
+  border-color: rgb(26 71 209 / 0.35);
+  box-shadow: 0 18px 40px -24px rgb(26 71 209 / 0.45);
+}
+
+/* ───────────────────────── Process ───────────────────────── */
+
+[data-node] {
+  transition:
+    background-color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.5s var(--ease-out);
+}
+
+[data-node][data-on] {
+  background-color: var(--color-ivory);
+  box-shadow:
+    0 0 0 1.5px var(--color-lens),
+    0 10px 24px -12px rgb(26 71 209 / 0.6);
+  transform: scale(1.06);
+}
+
+/* ───────────────────────── Cursor lens ───────────────────────── */
+
+.cursor-lens {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cursor-lens[data-visible] {
+  opacity: 1;
+}
+
+.cursor-lens__ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 9999px;
+  border: 1.5px solid rgb(18 26 54 / 0.42);
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.45s var(--ease-out),
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.cursor-lens__ring::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-lens);
+  transition: transform 0.3s var(--ease-out);
+}
+
+.cursor-lens[data-state="interactive"] .cursor-lens__ring {
+  transform: scale(1.65);
+  border-color: rgb(26 71 209 / 0.55);
+  background-color: rgb(26 71 209 / 0.06);
+}
+
+.cursor-lens[data-state="interactive"] .cursor-lens__ring::after {
+  transform: scale(0.5);
+}
+
+/* ───────────────────────── Floating WhatsApp ───────────────────────── */
+
+html[data-menu-open] .fab {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* ───────────────────────── Preferences ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  html.intro-play .intro,
+  .hero-veil,
+  .cursor-lens {
+    display: none !important;
+  }
+
+  .hero-media img,
+  .hero-line > span,
+  .hero-fade,
+  .chip-in,
+  .chip-float,
+  .marquee__track {
+    animation: none !important;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .chip-surface {
+    background-color: var(--color-ivory) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 }
