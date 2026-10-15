@@ -8,7 +8,7 @@ export function Faq() {
   const { faq } = site;
   return (
     <section id={faq.id} aria-labelledby="faq-title" className="py-24 sm:py-32 lg:py-40">
-      <Container className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <SplitHeading id="faq-title" order={110} className="font-display text-h2 font-medium text-ink">

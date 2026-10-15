@@ -192,9 +192,11 @@ export function Navbar({
           </nav>
 
           <div className="flex items-center gap-1">
-            <ButtonLink href={book.href} badge="whatsapp" size="sm" external className="hidden lg:inline-flex">
-              {book.label}
-            </ButtonLink>
+            <span className="hidden lg:block">
+              <ButtonLink href={book.href} badge="whatsapp" size="sm" external>
+                {book.label}
+              </ButtonLink>
+            </span>
 
             <a
               href={book.href}
@@ -291,10 +293,10 @@ export function Navbar({
               animate={{ opacity: 1, y: 0 }}
               transition={reduce ? { duration: 0 } : { ...spring, delay: 0.25 }}
             >
-              <ButtonLink href={book.href} badge="whatsapp" external className="w-full justify-between">
+              <ButtonLink href={book.href} badge="whatsapp" external fullWidth>
                 {book.label}
               </ButtonLink>
-              <ButtonLink href={call.href} variant="secondary" badge="phone" className="w-full justify-between">
+              <ButtonLink href={call.href} variant="secondary" badge="phone" fullWidth>
                 {call.label}
               </ButtonLink>
               <a

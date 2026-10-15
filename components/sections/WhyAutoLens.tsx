@@ -9,7 +9,7 @@ export function WhyAutoLens() {
   const { why } = site;
   return (
     <section id={why.id} aria-labelledby="why-title" className="py-24 sm:py-32 lg:py-40">
-      <Container className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+      <Container className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <div
             data-reveal
@@ -32,7 +32,7 @@ export function WhyAutoLens() {
           <SplitHeading id="why-title" order={91} className="max-w-[18ch] font-display text-h2 font-medium text-ink">
             {why.title}
           </SplitHeading>
-          <ul className="mt-12 grid gap-11 sm:mt-14">
+          <ul className="mt-12 grid grid-cols-1 gap-11 sm:mt-14">
             {why.pillars.map((pillar, index) => (
               <li
                 key={pillar.title}

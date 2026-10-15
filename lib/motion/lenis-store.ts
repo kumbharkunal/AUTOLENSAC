@@ -21,12 +21,12 @@ export function subscribeLenis(listener: () => void) {
   };
 }
 
-/** Smooth-scroll to an anchor (or element) with the floating-nav offset; falls back to native. */
+/** Smooth-scroll to an anchor (or element); CSS scroll-margin-top keeps it clear of the nav. */
 export function scrollToTarget(target: string | HTMLElement, opts: { immediate?: boolean } = {}) {
   const el = typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
   if (!el) return;
   if (instance) {
-    instance.scrollTo(el, { offset: -84, immediate: opts.immediate });
+    instance.scrollTo(el, { immediate: opts.immediate }); // honours scroll-margin-top
   } else {
     el.scrollIntoView({ behavior: opts.immediate ? "auto" : "smooth", block: "start" });
   }

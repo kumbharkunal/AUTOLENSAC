@@ -39,7 +39,7 @@ export function FinalCta() {
         <LensMark tone="ivory" className="mx-auto h-12 w-12" />
         <h2
           id="cta-title"
-          className="mx-auto mt-8 max-w-[18ch] font-display text-[clamp(2.6rem,1.4rem+5vw,6rem)] leading-[1.02] font-medium tracking-[-0.02em] text-ivory"
+          className="mx-auto mt-8 font-display text-[clamp(2.1rem,1.2rem+4.8vw,6rem)] leading-[1.02] font-medium tracking-[-0.02em] text-ivory"
         >
           {finalCta.title.map((line) => (
             <span key={line} className="block">

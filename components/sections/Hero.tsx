@@ -47,6 +47,10 @@ function Lines({ lines, variant }: { lines: readonly string[]; variant: "mobile"
   );
 }
 
+function chipPosition(pos: { x?: number; r?: number; y: number }): React.CSSProperties {
+  return pos.r !== undefined ? { right: `${pos.r}%`, top: `${pos.y}%` } : { left: `${pos.x ?? 0}%`, top: `${pos.y}%` };
+}
+
 function Chip({ label, value, index }: { label: string; value: string; index: number }) {
   return (
     <div className="chip-float" style={{ "--i": index } as CSSVars}>
@@ -121,7 +125,7 @@ export function Hero() {
             key={`d-${chip.label}`}
             data-depth={40 + index * 26}
             className="absolute z-[3] hidden md:block"
-            style={{ left: `${chip.desktop.x}%`, top: `${chip.desktop.y}%` }}
+            style={chipPosition(chip.desktop)}
           >
             <Chip label={chip.label} value={chip.value} index={index} />
           </div>
@@ -132,7 +136,7 @@ export function Hero() {
               key={`m-${chip.label}`}
               data-depth={24 + index * 18}
               className="absolute z-[3] md:hidden"
-              style={{ left: `${chip.mobile.x}%`, top: `${chip.mobile.y}%` }}
+              style={chipPosition(chip.mobile)}
             >
               <Chip label={chip.label} value={chip.value} index={index} />
             </div>
@@ -140,50 +144,43 @@ export function Hero() {
         )}
 
         {/* Copy */}
-        <div data-hero-content className="relative z-[4] mt-auto px-5 pt-40 pb-6 sm:px-8 sm:pb-9 lg:px-14 lg:pb-14">
-          <div className="grid items-end gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="lg:col-span-8">
-              <p
-                className="hero-fade mb-5 inline-flex items-center gap-2.5 font-mono text-[11.5px] leading-none font-medium tracking-[0.16em] text-ink/70 uppercase sm:mb-7 sm:text-[12px]"
-                style={{ "--d": "0.2s" } as CSSVars}
+        <div data-hero-content className="relative z-[4] mt-auto px-5 pt-40 pb-6 sm:px-8 sm:pb-9 lg:px-14 lg:pb-12">
+          <p
+            className="hero-fade mb-5 inline-flex items-center gap-2 font-mono text-[10.5px] leading-none font-medium tracking-[0.1em] whitespace-nowrap text-ink/70 uppercase min-[400px]:text-[11px] sm:mb-7 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.16em]"
+            style={{ "--d": "0.2s" } as CSSVars}
+          >
+            <LensMark className="h-3.5 w-3.5" />
+            {hero.eyebrow}
+          </p>
+          <h1 id="hero-title" className="font-display leading-[1.02] font-medium tracking-[-0.02em] text-ink">
+            <span className="sr-only">{hero.title}</span>
+            <Lines lines={hero.lines.mobile} variant="mobile" />
+            <Lines lines={hero.lines.tablet} variant="tablet" />
+            <Lines lines={hero.lines.desktop} variant="desktop" />
+          </h1>
+          <div className="mt-6 flex flex-col gap-6 sm:mt-8 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+            <p
+              className="hero-fade max-w-[34ch] text-[1.0625rem] leading-relaxed text-ink/80 sm:text-lg"
+              style={{ "--d": "0.75s" } as CSSVars}
+            >
+              {hero.subtitle}
+            </p>
+            <div className="hero-fade flex flex-wrap items-center gap-2 sm:gap-3" style={{ "--d": "0.9s" } as CSSVars}>
+              <ButtonLink href={whatsappHref()} badge="whatsapp" external>
+                {cta.book}
+              </ButtonLink>
+              <ButtonLink
+                href={telHref}
+                variant="secondary"
+                badge="phone"
+                ariaLabel={`Call ${contact.phoneDisplay}`}
+                className="bg-ivory/40"
               >
-                <LensMark className="h-3.5 w-3.5" />
-                {hero.eyebrow}
-              </p>
-              <h1 id="hero-title" className="font-display leading-[1.02] font-medium tracking-[-0.02em] text-ink">
-                <span className="sr-only">{hero.title}</span>
-                <Lines lines={hero.lines.mobile} variant="mobile" />
-                <Lines lines={hero.lines.tablet} variant="tablet" />
-                <Lines lines={hero.lines.desktop} variant="desktop" />
-              </h1>
-            </div>
-            <div className="lg:col-span-4 lg:pb-2">
-              <p
-                className="hero-fade max-w-[34ch] text-[1.0625rem] leading-relaxed text-ink/80 sm:text-lg"
-                style={{ "--d": "0.75s" } as CSSVars}
-              >
-                {hero.subtitle}
-              </p>
-              <div
-                className="hero-fade mt-6 flex flex-wrap items-center gap-3"
-                style={{ "--d": "0.9s" } as CSSVars}
-              >
-                <ButtonLink href={whatsappHref()} badge="whatsapp" external>
-                  {cta.book}
-                </ButtonLink>
-                <ButtonLink
-                  href={telHref}
-                  variant="secondary"
-                  badge="phone"
-                  ariaLabel={`Call ${contact.phoneDisplay}`}
-                  className="bg-ivory/40"
-                >
-                  <span className="sm:hidden">{cta.call}</span>
-                  <span className="hidden sm:inline">
-                    {cta.call} {contact.phoneShort}
-                  </span>
-                </ButtonLink>
-              </div>
+                <span className="sm:hidden">{cta.call}</span>
+                <span className="hidden sm:inline">
+                  {cta.call} {contact.phoneShort}
+                </span>
+              </ButtonLink>
             </div>
           </div>
         </div>

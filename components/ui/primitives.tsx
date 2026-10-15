@@ -47,6 +47,7 @@ export function ButtonLink({
   className,
   external,
   ariaLabel,
+  fullWidth = false,
 }: {
   href: string;
   children: React.ReactNode;
@@ -57,6 +58,8 @@ export function ButtonLink({
   className?: string;
   external?: boolean;
   ariaLabel?: string;
+  /** Stretch to the container with the label left and the badge right. */
+  fullWidth?: boolean;
 }) {
   const hasBadge = badge !== null;
   return (
@@ -65,10 +68,11 @@ export function ButtonLink({
       aria-label={ariaLabel}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group/btn relative inline-flex shrink-0 items-center justify-center gap-2.5 rounded-full font-sans font-medium whitespace-nowrap select-none",
+        "group/btn relative inline-flex shrink-0 items-center gap-2.5 rounded-full font-sans font-medium whitespace-nowrap select-none",
+        fullWidth ? "w-full justify-between" : "justify-center",
         "transition-[background-color,color,border-color,transform,box-shadow] duration-300 ease-out active:scale-[0.98]",
         size === "md" ? "h-[52px] text-[15.5px]" : "h-11 text-[14.5px]",
-        hasBadge ? (size === "md" ? "pr-1.5 pl-6" : "pr-1 pl-5") : size === "md" ? "px-6" : "px-5",
+        hasBadge ? (size === "md" ? "pr-1.5 pl-5 sm:pl-6" : "pr-1 pl-5") : size === "md" ? "px-5 sm:px-6" : "px-5",
         variants[variant],
         className,
       )}
@@ -80,7 +84,7 @@ export function ButtonLink({
           tone="badge"
           className={cn(
             "transition-transform duration-300 ease-out group-hover/btn:scale-105 group-hover/btn:-rotate-6",
-            size === "md" ? "ml-1.5 h-10 w-10" : "ml-1 h-9 w-9",
+            size === "md" ? "ml-1 h-10 w-10 sm:ml-1.5" : "ml-1 h-9 w-9",
           )}
         />
       ) : null}

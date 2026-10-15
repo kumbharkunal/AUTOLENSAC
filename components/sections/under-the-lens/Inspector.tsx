@@ -276,7 +276,7 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
   return (
     <section ref={sectionRef} id={id} aria-labelledby="lens-title" className="relative">
       <div ref={pinRef} className="flex flex-col justify-center py-24 sm:py-32 lg:h-[100svh] lg:py-0">
-        <Container className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
           {/* Copy, toggle and checklist */}
           <div className="lg:col-span-5 lg:pt-10">
             <Eyebrow>{eyebrow}</Eyebrow>
@@ -423,16 +423,17 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
                     data-index={index}
                     className="lens-card w-[82%] shrink-0 snap-center rounded-[22px] border border-ink/10 bg-ivory p-5 transition-[border-color,box-shadow] duration-300 sm:w-[60%] md:w-[46%]"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start justify-between gap-3">
                       <span className="grid h-10 w-10 place-items-center rounded-full bg-lens/10 text-lens">
                         <Icon name={point.icon} className="h-5 w-5" weight="regular" />
                       </span>
-                      <h3 className="font-display text-[1.5rem] leading-tight font-medium text-ink">{point.title}</h3>
+                      <span className="rounded-full bg-lens/[0.08] px-2.5 py-1 font-mono text-[10.5px] tracking-[0.12em] text-lens uppercase">
+                        {status}
+                      </span>
                     </div>
-                    <p className="mt-3 flex items-center gap-3 font-mono text-[11px] tracking-[0.12em] text-muted uppercase">
-                      <span className="truncate">{point.readout}</span>
-                      <span aria-hidden="true" className="leader text-ink" />
-                      <span className="text-lens">{status}</span>
+                    <h3 className="mt-4 font-display text-[1.5rem] leading-tight font-medium text-ink">{point.title}</h3>
+                    <p className="mt-1.5 font-mono text-[11px] leading-relaxed tracking-[0.12em] text-muted uppercase">
+                      {point.readout}
                     </p>
                     <p className="mt-3 text-[15px] leading-relaxed text-muted">{point.body}</p>
                   </li>

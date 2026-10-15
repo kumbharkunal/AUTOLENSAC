@@ -17,7 +17,7 @@ export function Footer() {
   return (
     <footer id="site-footer" data-menu-inert className="pb-8">
       <Container className="pt-20 sm:pt-28">
-        <div className="grid gap-x-10 gap-y-14 md:grid-cols-2 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <a href="#top" className="inline-block rounded-md text-[42px] sm:text-[48px]" aria-label="AutoLens, back to top">
               <Logo subline />

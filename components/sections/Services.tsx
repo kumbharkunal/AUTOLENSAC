@@ -86,7 +86,7 @@ export function Services() {
           </p>
         </div>
 
-        <ul className="mt-14 grid gap-4 sm:mt-16 lg:grid-cols-12 lg:grid-rows-[auto_auto_auto] lg:gap-5">
+        <ul className="mt-14 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-12 lg:grid-rows-[auto_auto_auto] lg:gap-5">
           {/* A: engine & battery (large, photo) */}
           <Shell className="lg:col-span-7 lg:row-span-2">
             <Photo

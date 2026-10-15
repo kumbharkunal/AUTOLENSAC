@@ -10,7 +10,7 @@ export function Problem() {
   const { problem, cta } = site;
   return (
     <section aria-labelledby="problem-title" className="py-24 sm:py-32 lg:py-40">
-      <Container className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+      <Container className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-28">
             <SplitHeading id="problem-title" order={20} className="max-w-[13ch] font-display text-h2 font-medium text-ink">
@@ -38,7 +38,7 @@ export function Problem() {
         </div>
 
         <div className="lg:col-span-7 lg:pt-4">
-          <ul className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2">
             {problem.findings.map((finding, index) => (
               <li key={finding.title} data-reveal style={{ "--d": (index % 2) * 90 } as React.CSSProperties}>
                 <span className="grid h-12 w-12 place-items-center rounded-full border border-ink/10 bg-ivory text-ink shadow-soft">

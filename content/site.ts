@@ -116,11 +116,17 @@ export const site = {
     imageAlt:
       "An AutoLens inspector holding a diagnostic tablet beside a new SUV in a bright dealership delivery bay",
     /** Glass "report" chips floating over the photograph (positions in % of the hero frame). */
+    // Positions in % of the hero frame: `x` = from the left edge, `r` = from the right edge.
     chips: [
-      { label: "Engine status", value: "Good", desktop: { x: 63, y: 22 }, mobile: { x: 8, y: 17 } },
-      { label: "Accident check", value: "Clear", desktop: { x: 80, y: 38 }, mobile: { x: 52, y: 29 } },
-      { label: "Odometer", value: "Verified", desktop: { x: 68, y: 54 }, mobile: null },
-    ],
+      { label: "Engine status", value: "Good", desktop: { x: 62, y: 22 }, mobile: { x: 6, y: 16 } },
+      { label: "Accident check", value: "Clear", desktop: { r: 5, y: 38 }, mobile: { r: 6, y: 28 } },
+      { label: "Odometer", value: "Verified", desktop: { x: 64, y: 54 }, mobile: null },
+    ] as {
+      label: string;
+      value: string;
+      desktop: { x?: number; r?: number; y: number };
+      mobile: { x?: number; r?: number; y: number } | null;
+    }[],
     /** Where the lens aperture opens from (the vehicle), in % of the frame. */
     focal: { desktop: { x: 70, y: 40 }, mobile: { x: 50, y: 32 } },
   },

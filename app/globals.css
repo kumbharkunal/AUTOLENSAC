@@ -332,7 +332,7 @@ html.intro-skip .intro {
   font-size: clamp(3.5rem, calc((100vw - 120px) / 10.6), 5.6rem);
 }
 .hero-title--desktop {
-  font-size: clamp(3.4rem, 5vw, 6.4rem);
+  font-size: clamp(3.4rem, 5.6vw, 6.6rem);
 }
 
 /* Report chips over the photograph. */
@@ -684,6 +684,29 @@ html[data-menu-open] .fab {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  /* The marquee becomes a calm, wrapped list. */
+  .marquee {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+  .marquee__track {
+    width: auto;
+    justify-content: center;
+    padding-inline: 1rem;
+  }
+  .marquee__list {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 1.25rem;
+  }
+  .marquee__list[aria-hidden] {
+    display: none;
+  }
+
+  .lens-hotspot[data-active]::after {
+    animation: none;
   }
 
   *,

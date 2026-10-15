@@ -25,7 +25,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
       lerp: 0.11,
       smoothWheel: true,
       syncTouch: false,
-      anchors: { offset: -84 },
+      anchors: true, // section scroll-margin-top (96px) clears the floating nav
     });
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

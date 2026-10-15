@@ -22,7 +22,7 @@ export function Process() {
             <div data-process-fill className="h-full w-full origin-top bg-lens lg:origin-left" />
           </div>
 
-          <ol className="relative grid gap-12 lg:grid-cols-4 lg:gap-10">
+          <ol className="relative grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-10">
             {process.steps.map((step, index) => (
               <li key={step.verb} data-reveal style={{ "--d": index * 90 } as React.CSSProperties} className="relative pl-16 lg:pt-20 lg:pl-0">
                 <span

@@ -32,7 +32,10 @@ function Svg({
   );
 }
 
-/** Gradient shared by every Instagram glyph on the page. Rendered once in the root layout. */
+/**
+ * One SVG sprite for the brand glyphs (paths defined once, referenced with <use>),
+ * plus the Instagram gradient. Rendered once in the root layout.
+ */
 export function BrandGradients() {
   return (
     <svg width="0" height="0" aria-hidden="true" focusable="false" className="pointer-events-none absolute">
@@ -44,6 +47,15 @@ export function BrandGradients() {
           <stop offset="0.75" stopColor="#D300C5" />
           <stop offset="1" stopColor="#7638FA" />
         </radialGradient>
+        <symbol id="al-ig" viewBox="0 0 24 24">
+          <path d={PATHS.instagram} />
+        </symbol>
+        <symbol id="al-fb" viewBox="0 0 24 24">
+          <path d={PATHS.facebook} />
+        </symbol>
+        <symbol id="al-wa" viewBox="0 0 24 24">
+          <path d={PATHS.whatsapp} />
+        </symbol>
       </defs>
     </svg>
   );
@@ -53,7 +65,7 @@ export function BrandGradients() {
 export function InstagramIcon({ className, title, mono }: IconProps & { mono?: boolean }) {
   return (
     <Svg className={className} title={title}>
-      <path d={PATHS.instagram} fill={mono ? "currentColor" : "url(#al-ig-gradient)"} />
+      <use href="#al-ig" width="24" height="24" fill={mono ? "currentColor" : "url(#al-ig-gradient)"} />
     </Svg>
   );
 }
@@ -61,7 +73,7 @@ export function InstagramIcon({ className, title, mono }: IconProps & { mono?: b
 export function FacebookIcon({ className, title, mono }: IconProps & { mono?: boolean }) {
   return (
     <Svg className={className} title={title}>
-      <path d={PATHS.facebook} fill={mono ? "currentColor" : "#0866FF"} />
+      <use href="#al-fb" width="24" height="24" fill={mono ? "currentColor" : "#0866FF"} />
     </Svg>
   );
 }
@@ -76,13 +88,13 @@ export function WhatsAppIcon({
     return (
       <Svg className={className} title={title} viewBox="0 0 32 32">
         <circle cx="16" cy="16" r="16" fill="#25D366" />
-        <path d={PATHS.whatsapp} fill="#fff" transform="translate(6.6 6.4) scale(0.79)" />
+        <use href="#al-wa" x="6.6" y="6.4" width="18.96" height="18.96" fill="#fff" />
       </Svg>
     );
   }
   return (
     <Svg className={className} title={title}>
-      <path d={PATHS.whatsapp} fill={tone === "white" ? "#fff" : "#25D366"} />
+      <use href="#al-wa" width="24" height="24" fill={tone === "white" ? "#fff" : "#25D366"} />
     </Svg>
   );
 }
