@@ -64,9 +64,9 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-// Runs before first paint: marks JS as available (for scroll reveals) and decides whether the
-// first-visit lens intro plays (never under reduced motion, once per browser session).
-const bootScript = `(function(){var d=document.documentElement;d.classList.add("js");try{if(${site.features.intro}&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("al-intro")){d.classList.add("intro-play");sessionStorage.setItem("al-intro","1")}}catch(e){}})();`;
+// Runs before first paint: decides whether the first-visit lens intro plays (never under reduced
+// motion, once per browser session).
+const bootScript = `(function(){var d=document.documentElement;try{if(${site.features.intro}&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches&&!sessionStorage.getItem("al-intro")){d.classList.add("intro-play");sessionStorage.setItem("al-intro","1")}}catch(e){}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

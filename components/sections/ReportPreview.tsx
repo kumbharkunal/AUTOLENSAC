@@ -12,7 +12,7 @@ export function ReportPreview() {
 
   return (
     <section id={report.id} aria-labelledby="report-title" className="px-2 py-3 sm:px-3">
-      <div className="rounded-[24px] bg-sand/55 py-20 sm:py-28 md:rounded-[36px] lg:py-36">
+      <div className="section-y-20 sm:section-y-28 lg:section-y-36 rounded-[24px] bg-sand/55 md:rounded-[36px]">
         <Container className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <Eyebrow>{report.eyebrow}</Eyebrow>

@@ -7,7 +7,7 @@ import { site } from "@/content/site";
 export function Process() {
   const { process } = site;
   return (
-    <section id={process.id} aria-labelledby="process-title" className="py-24 sm:py-32 lg:py-40">
+    <section id={process.id} aria-labelledby="process-title" className="section-y-24 sm:section-y-32 lg:section-y-40">
       <Container>
         <SplitHeading id="process-title" order={65} className="max-w-[16ch] font-display text-h2 font-medium text-ink">
           {process.title}

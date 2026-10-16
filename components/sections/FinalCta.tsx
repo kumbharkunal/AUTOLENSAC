@@ -13,7 +13,7 @@ export function FinalCta() {
   const { finalCta, cta, contact } = site;
   return (
     <section id={finalCta.id} aria-labelledby="cta-title" className="px-2 sm:px-3">
-      <CtaRings className="on-navy relative isolate overflow-hidden rounded-[24px] bg-navy px-5 py-24 text-center sm:py-32 md:rounded-[36px] lg:py-40">
+      <CtaRings className="on-navy section-y-24 sm:section-y-32 lg:section-y-40 relative isolate overflow-hidden rounded-[24px] bg-navy px-5 text-center md:rounded-[36px]">
         <Image
           src={images.ctaBg}
           alt=""

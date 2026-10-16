@@ -7,7 +7,7 @@ import { site } from "@/content/site";
 export function Statement() {
   const { statement } = site;
   return (
-    <section aria-labelledby="statement-title" className="relative py-28 sm:py-36 lg:py-48">
+    <section aria-labelledby="statement-title" className="relative section-y-28 sm:section-y-36 lg:section-y-48">
       <Container className="text-center">
         <StatementScrub>
           <h2

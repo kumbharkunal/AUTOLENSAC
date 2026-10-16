@@ -10,7 +10,7 @@ export function Testimonials() {
   if (!testimonials.enabled || testimonials.items.length === 0) return null;
 
   return (
-    <section aria-labelledby="testimonials-title" className="py-24 sm:py-32">
+    <section aria-labelledby="testimonials-title" className="section-y-24 sm:section-y-32">
       <Rail titleId="testimonials-title" title={testimonials.title} label="Customer reviews">
         {testimonials.items.map((item, index) => (
           <li

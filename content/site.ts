@@ -115,17 +115,20 @@ export const site = {
     subtitle: "Expert computerized car & bike diagnosis before delivery.",
     imageAlt:
       "An AutoLens inspector holding a diagnostic tablet beside a new SUV in a bright dealership delivery bay",
-    /** Glass "report" chips floating over the photograph (positions in % of the hero frame). */
-    // Positions in % of the hero frame: `x` = from the left edge, `r` = from the right edge.
+    /**
+     * Glass "report" chips floating over the photograph, top to bottom. They share the space between
+     * the navigation and the headline (spaced automatically, so they never cover the text).
+     * `x` = % from the left edge, `r` = % from the right edge. On short screens the last chips drop out.
+     */
     chips: [
-      { label: "Engine status", value: "Good", desktop: { x: 62, y: 22 }, mobile: { x: 6, y: 16 } },
-      { label: "Accident check", value: "Clear", desktop: { r: 5, y: 38 }, mobile: { r: 6, y: 28 } },
-      { label: "Odometer", value: "Verified", desktop: { x: 64, y: 54 }, mobile: null },
+      { label: "Engine status", value: "Good", desktop: { x: 62 }, mobile: { x: 6 } },
+      { label: "Accident check", value: "Clear", desktop: { r: 5 }, mobile: { r: 6 } },
+      { label: "Odometer", value: "Verified", desktop: { x: 64 }, mobile: null },
     ] as {
       label: string;
       value: string;
-      desktop: { x?: number; r?: number; y: number };
-      mobile: { x?: number; r?: number; y: number } | null;
+      desktop: { x?: number; r?: number };
+      mobile: { x?: number; r?: number } | null;
     }[],
     /** Where the lens aperture opens from (the vehicle), in % of the frame. */
     focal: { desktop: { x: 70, y: 40 }, mobile: { x: 50, y: 32 } },

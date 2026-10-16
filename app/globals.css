@@ -27,6 +27,15 @@
   --shadow-lift: 0 40px 80px -32px rgb(18 26 54 / 0.35);
 }
 
+/*
+ * Height-aware variants. Laptops at 125-150% display scaling give the browser only ~560-730px of
+ * height, so anything pinned or sticky must fit the screen it is on.
+ * - pin-ok: "Under the lens" sticks and scrubs here, with motion allowed (MQ_PIN in lib/gsap.ts)
+ * - tall: tall enough for a sticky column with an image
+ */
+@custom-variant pin-ok (@media (min-width: 1024px) and (min-height: 560px));
+@custom-variant tall (@media (min-height: 820px));
+
 @theme inline {
   --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -61,6 +70,15 @@
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+/*
+ * Section rhythm: `section-y-24` is `py-24` on normal screens, but never more than a slice of a
+ * short one (landscape phones, laptops at 125-150% scaling), so gaps between sections can't fill
+ * most of the screen.
+ */
+@utility section-y-* {
+  padding-block: min(--spacing(--value(integer)), calc(--value(integer) * 0.6svh));
 }
 
 /* ───────────────────────── Surfaces ───────────────────────── */
@@ -336,6 +354,39 @@ html.intro-skip .intro {
   font-size: clamp(3.4rem, 5.6vw, 6.6rem);
 }
 
+/*
+ * Report chips: they share the band between the floating navigation and the copy, spaced evenly.
+ * The band is a size container, so when a short screen leaves too little room the last chips drop
+ * out instead of colliding with the headline.
+ */
+.hero-chips {
+  container-type: size;
+  pointer-events: none;
+}
+
+.hero-chips__band {
+  position: absolute;
+  inset: 5.25rem 0 0.5rem;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+@container (max-height: 249px) {
+  .hero-chips [data-chip="3"] {
+    display: none;
+  }
+}
+@container (max-height: 189px) {
+  .hero-chips [data-chip="2"] {
+    display: none;
+  }
+}
+@container (max-height: 139px) {
+  .hero-chips [data-chip="1"] {
+    display: none;
+  }
+}
+
 /* Report chips over the photograph. */
 .chip-surface {
   background-color: rgb(251 248 242 / 0.9);
@@ -385,18 +436,22 @@ html.intro-skip .intro {
 
 /* ───────────────────────── Scroll reveals ───────────────────────── */
 
-html.js [data-reveal] {
+/*
+ * Content is only held back once the observer that reveals it is running (MotionRoot sets
+ * html[data-reveals]). If scripts are slow or fail, everything simply stays visible.
+ * Hiding is instant and only the reveal animates: a transition on the hidden state would start
+ * dozens of offscreen transitions (and transition events) the moment the observer switches on.
+ */
+html[data-reveals] [data-reveal]:not([data-revealed]) {
   opacity: 0;
   transform: translate3d(0, 26px, 0);
+}
+
+[data-reveal][data-revealed] {
   transition:
     opacity 0.9s var(--ease-out),
     transform 1.05s var(--ease-out);
   transition-delay: calc(var(--d, 0) * 1ms);
-}
-
-html.js [data-reveal][data-revealed] {
-  opacity: 1;
-  transform: none;
 }
 
 /* SplitText line masks: room for italic overhang and descenders. */
@@ -681,9 +736,11 @@ html[data-menu-open] .fab {
     animation: none !important;
   }
 
-  html.js [data-reveal] {
+  html[data-reveals] [data-reveal]:not([data-revealed]) {
     opacity: 1;
     transform: none;
+  }
+  [data-reveal][data-revealed] {
     transition: none;
   }
 

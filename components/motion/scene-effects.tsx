@@ -210,13 +210,19 @@ export function SceneEffect({
     (_context, contextSafe) => {
       const setup = SETUPS[kind];
       const mm = gsap.matchMedia();
+      let alive = true;
       const run = contextSafe!(() => {
         const root = target.current;
-        if (!root || !root.isConnected) return;
+        if (!alive || !root || !root.isConnected) return;
         mm.add(setup.media, () => setup.run(root, { amount }));
       });
-      scheduleMotion(order ?? setup.order, run);
-      return () => mm.revert();
+      // A setup must never outlive its component, or a scene is built twice (Strict Mode).
+      const cancel = scheduleMotion(order ?? setup.order, run);
+      return () => {
+        alive = false;
+        cancel();
+        mm.revert();
+      };
     },
     { scope: target },
   );

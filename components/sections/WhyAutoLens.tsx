@@ -8,12 +8,12 @@ import { site } from "@/content/site";
 export function WhyAutoLens() {
   const { why } = site;
   return (
-    <section id={why.id} aria-labelledby="why-title" className="py-24 sm:py-32 lg:py-40">
+    <section id={why.id} aria-labelledby="why-title" className="section-y-24 sm:section-y-32 lg:section-y-40">
       <Container className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <div
             data-reveal
-            className="relative aspect-[4/5] overflow-hidden rounded-card bg-sand shadow-float lg:sticky lg:top-28"
+            className="relative aspect-[4/5] overflow-hidden rounded-card bg-sand shadow-float lg:sticky lg:top-28 lg:max-h-[calc(100svh-9rem)]"
           >
             <Parallax className="absolute inset-x-0 -inset-y-[8%]" order={90}>
               <Image

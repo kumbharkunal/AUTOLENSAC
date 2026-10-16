@@ -9,10 +9,11 @@ import { whatsappHref } from "@/lib/links";
 export function Problem() {
   const { problem, cta } = site;
   return (
-    <section aria-labelledby="problem-title" className="py-24 sm:py-32 lg:py-40">
+    <section aria-labelledby="problem-title" className="section-y-24 sm:section-y-32 lg:section-y-40">
       <Container className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
-          <div className="lg:sticky lg:top-28">
+          {/* Sticky only where the whole column (headline, text and photo) fits on screen */}
+          <div className="lg:tall:sticky lg:tall:top-28">
             <SplitHeading id="problem-title" order={20} className="max-w-[13ch] font-display text-h2 font-medium text-ink">
               {problem.title}
             </SplitHeading>
@@ -21,7 +22,7 @@ export function Problem() {
             </p>
             <div
               data-reveal
-              className="relative mt-10 aspect-[4/5] max-h-[520px] overflow-hidden rounded-card bg-sand shadow-float sm:aspect-[16/11] lg:aspect-[4/5]"
+              className="relative mt-10 aspect-[4/5] max-h-[520px] overflow-hidden rounded-card bg-sand shadow-float sm:aspect-[16/11] lg:aspect-[4/5] lg:tall:max-h-[min(520px,calc(100svh-36rem))]"
             >
               <Parallax className="absolute inset-x-0 -inset-y-[8%]" order={21}>
                 <Image

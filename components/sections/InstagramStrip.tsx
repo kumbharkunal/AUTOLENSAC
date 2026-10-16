@@ -9,7 +9,7 @@ import { site } from "@/content/site";
 export function InstagramStrip() {
   const { instagram, contact, cta } = site;
   return (
-    <section aria-labelledby="instagram-title" className="py-24 sm:py-32">
+    <section aria-labelledby="instagram-title" className="section-y-24 sm:section-y-32">
       <Container>
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -32,14 +32,14 @@ export function InstagramStrip() {
           </ButtonLink>
         </div>
 
-        <ul className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+        <ul className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-6">
           {instagram.tiles.map((tile, index) => (
             <li key={index} data-reveal style={{ "--d": index * 60 } as React.CSSProperties}>
               <a
                 href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative block aspect-square overflow-hidden rounded-[22px] bg-sand"
+                className="group @container relative block aspect-square overflow-hidden rounded-[22px] bg-sand"
               >
                 {tile.kind === "image" ? (
                   <Image
@@ -53,7 +53,8 @@ export function InstagramStrip() {
                 ) : (
                   <span className="flex h-full flex-col justify-between border border-ink/10 bg-ivory p-4 sm:p-5">
                     <LensMark className="h-6 w-6" />
-                    <span className="font-display text-[1.15rem] leading-snug font-medium text-ink sm:text-[1.25rem]">
+                    {/* Sized by the tile's width, so a long tip always fits its square */}
+                    <span className="font-display text-[length:clamp(0.875rem,8cqi,1.25rem)] leading-snug font-medium text-ink">
                       {tile.text}
                     </span>
                   </span>

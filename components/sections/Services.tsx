@@ -75,7 +75,7 @@ export function Services() {
   const [engine, paint, odometer, hidden, consult] = services.items;
 
   return (
-    <section id={services.id} aria-labelledby="services-title" className="py-24 sm:py-32 lg:py-40">
+    <section id={services.id} aria-labelledby="services-title" className="section-y-24 sm:section-y-32 lg:section-y-40">
       <Container>
         <div className="max-w-[44rem]">
           <SplitHeading id="services-title" order={30} className="font-display text-h2 font-medium text-ink">

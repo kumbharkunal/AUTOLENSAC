@@ -3,7 +3,7 @@
 A pitch homepage for **AutoLens** ([@autolensac](https://www.instagram.com/autolensac/)), a pre-delivery inspection (PDI) and vehicle consultancy for new cars and bikes. Light, editorial and photography-led, built around the idea of a lens: the page arrives slightly out of focus and resolves into clarity.
 
 - **Stack:** Next.js 16.4 (App Router, TypeScript), Tailwind CSS 4, GSAP 3.15 (ScrollTrigger, SplitText, `@gsap/react`), Lenis, Motion, Phosphor icons. Deploys to Vercel with no environment variables.
-- **Measured** (Lighthouse mobile, placeholder images): Performance 91 · Accessibility 100 · Best Practices 100 · SEO 100 (CLS 0.002).
+- **Measured** (Lighthouse mobile, local production build, placeholder images): Performance 91 · Accessibility 100 · Best Practices 100 · SEO 100 (CLS ≤ 0.002). Local Performance scores swing with how busy the laptop is (the same build scored 76–83 on a busy day), so confirm on the deployed URL with PageSpeed Insights.
 - **Research and design docs:** [`research/client-brief.md`](research/client-brief.md) · [`research/design-rules.md`](research/design-rules.md) · [`IMAGE_PROMPTS.md`](IMAGE_PROMPTS.md)
 
 ---
@@ -42,7 +42,7 @@ Anything unconfirmed is marked `// TODO: confirm with client` in that file and l
 
 ## Add the real photographs
 
-The site ships with soft, on-palette placeholder images at the exact final paths, so it already looks finished. To replace them:
+The site ships with on-palette placeholder images at the exact final paths (soft scenes for the wide shots, simple illustrations for the close-ups), so it already looks finished. To replace them:
 
 1. Generate each image in ChatGPT with the prompts in **[`IMAGE_PROMPTS.md`](IMAGE_PROMPTS.md)**. They are listed in priority order and each one is self-contained.
 2. Save the PNGs in **`/raw-images`** with the exact names given (e.g. `raw-images/hero-desktop.png`). The PNGs themselves are not committed.
@@ -54,7 +54,7 @@ The site ships with soft, on-palette placeholder images at the exact final paths
    This crops and resizes each image to its final size and writes **WebP + AVIF** to `/public/images` (plus a JPEG for the share image). `next/image` then serves AVIF/WebP at every screen size.
 4. Commit `public/images` and redeploy.
 
-The sizes and crop positions live in `scripts/image-specs.mjs`. To regenerate the placeholders: `npm run images:placeholders`. It only fills in missing files; add `-- --force` to overwrite everything, real photos included.
+The sizes and crop positions live in `scripts/image-specs.mjs`. To regenerate the placeholders: `npm run images:placeholders`. It only fills in missing files; `-- --force handover` redraws just the ones you name, and `-- --force` on its own overwrites everything, real photos included.
 
 ### Calibrate the "Under the lens" hotspots
 
@@ -110,12 +110,18 @@ Everything below is a placeholder or an assumption in the current build:
 - **No Three.js.** The lens idea is carried by the hero aperture and the "Under the lens" magnifier at zero WebGL cost. A 3D element would cost 150 KB+ of JavaScript and put the mobile score at risk.
 - **Motion off the critical path.** The hero's entrance (intro, lens aperture, line reveals, chips) is pure CSS, so it plays before any JavaScript arrives. Smooth scrolling and scroll choreography load on the first interaction, or 2.5s after the page has loaded:
   - Lenis, GSAP + ScrollTrigger + SplitText (still `useGSAP`, via lazily mounted effect components)
-  - the pinned inspector
+  - the inspector's scroll scene
   - the Motion mobile menu
 
   This took Lighthouse mobile from about 82 to 91 without dropping any effect.
 - **Motion vs CSS.** Motion powers the mobile menu sheet (AnimatePresence, springs, staggered links). Simple state changes use CSS transitions with the same easing curves: navbar hide/shrink, hamburger morph, FAQ height, WhatsApp button. This keeps the Motion runtime out of the initial download.
 - **Hero headline lines are authored.** Each breakpoint has hand-set lines, revealed by CSS rather than SplitText, so the headline animates without waiting for JavaScript. SplitText drives every section headline and the statement.
+- **Short screens are first-class.** Windows laptops at 125–150% display scaling give the browser only about 560–730px of height, so nothing is allowed to be taller than the screen it sticks to:
+  - "Under the lens" is a CSS-sticky panel (no GSAP pin, so nothing on the page moves when the motion code arrives). It sticks only on screens at least 560px tall, and its copy scales with the screen height so it always fits.
+  - The hero's report chips share the space between the navigation and the headline and drop out one by one when that space runs short, so they never cover the text.
+  - The Problem column only sticks on screens at least 820px tall; the Why photo is capped to the screen height.
+  - Space between sections scales with the screen height (`section-y-*` in `app/globals.css`): identical on normal screens, tighter on short ones, so a gap never fills most of the screen.
+  - Checked with real wheel scrolling (dev and production builds) at 1280×577, 1366×657, 1536×730, 1440×900, 1920×969, 1024×600, 1180×820, 768×1024, 390×664, 360×640, 844×390 and 932×430.
 - **One booking label everywhere:** "Book your PDI" (the brief suggested "Book PDI" for the nav).
 - **Testimonials** are visible with obvious "Placeholder" tags so the client sees the design. Switch them off with `testimonials.enabled`.
 - **Cursor follower:** contextual, desktop mouse only, never replaces the system cursor, off under reduced motion, and can be switched off.
@@ -130,8 +136,8 @@ Everything below is a placeholder or an assumption in the current build:
 - Static page (`ensureStatic = "navigation"`), served from the CDN. No third-party scripts.
 - Images go through `next/image` with exact `sizes`, AVIF/WebP and blur placeholders; only the hero is high priority (art-directed `<picture>` for phone and desktop).
 - Fonts are self-hosted via `next/font`; Cormorant uses its static 500 weight.
-- Only `transform`/`opacity` animate (plus a one-off mask on the hero veil). There's one pinned section, and no WebGL.
-- **`prefers-reduced-motion`:** no intro, veil, pin, parallax, Lenis or cursor; everything is visible and the marquee becomes a static list.
+- Only `transform`/`opacity` animate (plus a one-off mask on the hero veil). There's one sticky scroll scene (CSS `position: sticky`, so the layout never shifts when motion loads), and no WebGL.
+- **`prefers-reduced-motion`:** no intro, veil, sticky scroll scene, parallax, Lenis or cursor; everything is visible and the marquee becomes a static list.
 - **`prefers-reduced-transparency`:** glass surfaces turn solid.
 - **Accessibility:**
   - Skip link, landmarks, one `h1`, visible focus rings, 44px touch targets and AA contrast.

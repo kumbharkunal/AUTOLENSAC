@@ -47,8 +47,11 @@ function Lines({ lines, variant }: { lines: readonly string[]; variant: "mobile"
   );
 }
 
-function chipPosition(pos: { x?: number; r?: number; y: number }): React.CSSProperties {
-  return pos.r !== undefined ? { right: `${pos.r}%`, top: `${pos.y}%` } : { left: `${pos.x ?? 0}%`, top: `${pos.y}%` };
+/** Horizontal place of a chip in its band: `x` = % from the left edge, `r` = % from the right edge. */
+function chipPlacement(pos: { x?: number; r?: number }): React.CSSProperties {
+  return pos.r !== undefined
+    ? { alignSelf: "flex-end", marginRight: `${pos.r}%` }
+    : { alignSelf: "flex-start", marginLeft: `${pos.x ?? 0}%` };
 }
 
 function Chip({ label, value, index }: { label: string; value: string; index: number }) {
@@ -86,7 +89,9 @@ export function Hero() {
       className="relative px-2 pt-2 sm:px-3 sm:pt-3"
       style={heroFocalVars()}
     >
-      <HeroMotion className="relative isolate flex min-h-[calc(100svh-16px)] flex-col overflow-hidden rounded-[24px] bg-sand sm:min-h-[calc(100svh-24px)] md:rounded-[36px]">
+      {/* Two rows: the chip band takes whatever height the copy leaves (a grid row, not a flex
+          item: Chrome only resolves the band's size container queries reliably in grid). */}
+      <HeroMotion className="relative isolate grid min-h-[calc(100svh-16px)] grid-rows-[minmax(6rem,1fr)_auto] overflow-hidden rounded-[24px] bg-sand sm:min-h-[calc(100svh-24px)] md:rounded-[36px]">
         {/* Photograph (the LCP element: painted immediately, under the veil) */}
         <div data-hero-media className="hero-media absolute inset-x-0 -top-[12%] bottom-0">
           <picture>
@@ -109,42 +114,42 @@ export function Hero() {
           />
         </div>
 
-        {/* Scrims keep the type at AA contrast on any photograph */}
+        {/* Top scrim keeps the navigation legible on any photograph */}
         <div
           aria-hidden="true"
           className="absolute inset-x-0 top-0 z-[2] h-36 bg-linear-to-b from-cream/70 to-transparent"
         />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 z-[2] h-[68%] bg-linear-to-t from-cream from-12% via-cream/80 via-45% to-transparent md:h-[58%] md:from-cream/95"
-        />
 
-        {/* Report chips */}
-        {hero.chips.map((chip, index) => (
-          <div
-            key={`d-${chip.label}`}
-            data-depth={40 + index * 26}
-            className="absolute z-[3] hidden md:block"
-            style={chipPosition(chip.desktop)}
-          >
-            <Chip label={chip.label} value={chip.value} index={index} />
+        {/*
+          Report chips (illustrative, so hidden from screen readers). They live in the band between
+          the navigation and the copy, so they can never sit on the headline; when a short screen
+          leaves too little room, chips drop out (container queries in globals.css).
+        */}
+        <div aria-hidden="true" className="hero-chips relative z-[5]">
+          <div className="hero-chips__band hidden md:flex">
+            {hero.chips.map((chip, index) => (
+              <div key={chip.label} data-depth={40 + index * 26} data-chip={index + 1} style={chipPlacement(chip.desktop)}>
+                <Chip label={chip.label} value={chip.value} index={index} />
+              </div>
+            ))}
           </div>
-        ))}
-        {hero.chips.map((chip, index) =>
-          chip.mobile ? (
-            <div
-              key={`m-${chip.label}`}
-              data-depth={24 + index * 18}
-              className="absolute z-[3] md:hidden"
-              style={chipPosition(chip.mobile)}
-            >
-              <Chip label={chip.label} value={chip.value} index={index} />
-            </div>
-          ) : null,
-        )}
+          <div className="hero-chips__band flex md:hidden">
+            {hero.chips.map((chip, index) =>
+              chip.mobile ? (
+                <div key={chip.label} data-depth={24 + index * 18} data-chip={index + 1} style={chipPlacement(chip.mobile)}>
+                  <Chip label={chip.label} value={chip.value} index={index} />
+                </div>
+              ) : null,
+            )}
+          </div>
+        </div>
 
-        {/* Copy */}
-        <div data-hero-content className="relative z-[4] mt-auto px-5 pt-40 pb-6 sm:px-8 sm:pb-9 lg:px-14 lg:pb-12">
+        {/* Copy (its scrim grows with it, so the type stays at AA contrast on any photograph) */}
+        <div data-hero-content className="relative z-[4] px-5 pb-6 sm:px-8 sm:pb-9 lg:px-14 lg:pb-12">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 -top-20 bottom-0 -z-10 bg-linear-to-t from-cream from-12% via-cream/80 via-45% to-transparent md:from-cream/95"
+          />
           <p
             className="hero-fade mb-5 inline-flex items-center gap-2 font-mono text-[10.5px] leading-none font-medium tracking-[0.1em] whitespace-nowrap text-ink/70 uppercase min-[400px]:text-[11px] sm:mb-7 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.16em]"
             style={{ "--d": "0.2s" } as CSSVars}

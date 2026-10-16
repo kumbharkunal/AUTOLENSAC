@@ -13,7 +13,7 @@ import { getLenis } from "@/lib/motion/lenis-store";
 import { useMotionReady } from "@/lib/motion/ready";
 import type { InspectorEngine, PinApi } from "./InspectorPin";
 
-// The desktop pinned timeline (GSAP + ScrollTrigger) loads on demand, once motion is unlocked.
+// The desktop scroll timeline (GSAP + ScrollTrigger) loads on demand, once motion is unlocked.
 const InspectorPin = dynamic(() => import("./InspectorPin").then((mod) => mod.InspectorPin), { ssr: false });
 
 type Kind = {
@@ -44,7 +44,7 @@ const easeInOutCubic = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2
 /**
  * "Under the lens": a real magnifying loupe travels across the vehicle, checkpoint by checkpoint.
  * One DOM, two drivers:
- * - desktop with motion: a pinned, scrubbed GSAP timeline (InspectorPin, loaded on demand)
+ * - desktop with motion: a CSS-sticky panel and a scrubbed GSAP timeline (InspectorPin, loaded on demand)
  * - mobile, tablet or reduced motion: a swipeable card rail and clickable list/hotspots,
  *   gliding the lens with a tiny requestAnimationFrame tween (no library needed)
  * Everything the loupe does is transform-only; React only renders structure and text.
@@ -55,7 +55,6 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
   const count = kind.checkpoints.length;
 
   const sectionRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const loupeRef = useRef<HTMLDivElement>(null);
   const loupeImgRef = useRef<HTMLDivElement>(null);
@@ -257,22 +256,35 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
   };
 
   return (
-    <section ref={sectionRef} id={id} aria-labelledby="lens-title" className="relative">
-      <div ref={pinRef} className="flex flex-col justify-center py-24 sm:py-32 lg:h-[100svh] lg:py-0">
+    // Desktop with motion: the section is 4.4 screens tall and the panel inside is CSS-sticky, so
+    // the "pin" exists from the first paint (nothing is inserted or shifts when the scroll scene
+    // loads). The panel is at least one screen tall (never a fixed height, so it can't spill into
+    // its neighbours) and its copy scales with the screen height, so it fits while it sticks.
+    <section
+      ref={sectionRef}
+      id={id}
+      aria-labelledby="lens-title"
+      className="relative pin-ok:motion-safe:h-[440svh] pin-ok:motion-safe:scroll-mt-0"
+    >
+      <div className="flex flex-col justify-center section-y-24 sm:section-y-32 lg:min-h-[100svh] lg:section-y-20 pin-ok:py-0 pin-ok:motion-safe:sticky pin-ok:motion-safe:top-0">
         <Container className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
           {/* Copy, toggle and checklist */}
-          <div className="lg:col-span-5 lg:pt-10">
+          <div className="lg:col-span-5">
             <Eyebrow>{eyebrow}</Eyebrow>
-            <SplitHeading id="lens-title" order={55} className="mt-5 font-display text-h2 font-medium text-ink">
+            <SplitHeading
+              id="lens-title"
+              order={55}
+              className="mt-5 font-display text-h2 font-medium text-ink lg:mt-4 lg:text-[length:min(clamp(2.25rem,1.4rem+3.4vw,4.75rem),9.5svh)]"
+            >
               {title}
             </SplitHeading>
-            <p className="mt-5 max-w-[42ch] text-lead text-muted">{body}</p>
+            <p className="mt-5 max-w-[42ch] text-lead text-muted lg:mt-4">{body}</p>
 
             <div
               role="radiogroup"
               aria-label="Vehicle type"
               onKeyDown={onToggleKeys}
-              className="relative mt-7 inline-grid grid-cols-2 rounded-full bg-sand/70 p-1 ring-1 ring-ink/5"
+              className="relative mt-7 inline-grid grid-cols-2 rounded-full bg-sand/70 p-1 ring-1 ring-ink/5 lg:mt-[clamp(1rem,3.5svh,1.75rem)]"
             >
               <span
                 aria-hidden="true"
@@ -298,7 +310,7 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
               ))}
             </div>
 
-            <ol className="mt-8 hidden lg:block">
+            <ol className="mt-[clamp(1rem,3svh,2rem)] hidden lg:block">
               {kind.checkpoints.map((point, index) => (
                 <li key={index}>
                   <button
@@ -306,13 +318,13 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
                     data-index={index}
                     aria-pressed="false"
                     onClick={() => select(index)}
-                    className="lens-item group flex w-full items-start gap-4 rounded-2xl py-2.5 text-left text-ink/55 transition-colors duration-300 hover:text-ink"
+                    className="lens-item group flex w-full items-start gap-4 rounded-2xl py-[clamp(0.25rem,1.2svh,0.625rem)] text-left text-ink/55 transition-colors duration-300 hover:text-ink"
                   >
-                    <span className="lens-item__mark mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors duration-300">
+                    <span className="lens-item__mark grid h-8 w-8 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors duration-300">
                       <span className="h-4 w-4">{icons[point.icon]}</span>
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block font-display text-[1.45rem] leading-tight font-medium">{point.title}</span>
+                      <span className="block font-display text-[clamp(1.2rem,2.8svh,1.45rem)] leading-8 font-medium">{point.title}</span>
                       <span className="lens-item__detail">
                         <span className="overflow-hidden">
                           <span className="mt-1.5 flex items-center gap-3 font-mono text-[11.5px] tracking-[0.12em] text-muted uppercase">
@@ -445,14 +457,7 @@ export function Inspector({ id, eyebrow, title, body, status, ready, kinds, imag
         </Container>
       </div>
       {motionReady ? (
-        <InspectorPin
-          sectionRef={sectionRef}
-          pinRef={pinRef}
-          engine={engine}
-          count={count}
-          render={render}
-          onPinned={onPinned}
-        />
+        <InspectorPin sectionRef={sectionRef} engine={engine} count={count} render={render} onPinned={onPinned} />
       ) : null}
     </section>
   );

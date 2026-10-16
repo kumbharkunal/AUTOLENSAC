@@ -39,13 +39,13 @@ export function MotionRoot({ children, cursor = true }: { children: React.ReactN
     return cleanup;
   }, []);
 
-  // Scroll reveals: one observer for the whole page.
+  // Scroll reveals: one observer for the whole page. Content is only held back (html[data-reveals])
+  // while this observer runs, so a slow or failed script can never leave a section blank.
   useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const root = document.documentElement;
     const reveal = (el: Element) => el.setAttribute("data-revealed", "");
-    if (!("IntersectionObserver" in window)) {
-      document.querySelectorAll("[data-reveal]").forEach(reveal);
-      return;
-    }
+    root.setAttribute("data-reveals", "");
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -74,6 +74,7 @@ export function MotionRoot({ children, cursor = true }: { children: React.ReactN
     return () => {
       io.disconnect();
       mo.disconnect();
+      root.removeAttribute("data-reveals");
     };
   }, []);
 

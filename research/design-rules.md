@@ -103,7 +103,7 @@ Rules:
 - Breakpoints: Tailwind defaults (640 / 768 / 1024 / 1280 / 1536). Tested at 360, 390, 430, 768, 1024, 1440, 1920.
 - Hero: `min-h-[100svh]` (the stable small-viewport unit, so no jumps as mobile browser bars collapse).
 - Every multi-column layout declares its below-768 px single-column fallback in the same component.
-- **Layout families, one per section:** framed photo plate (hero) · centred manifesto (statement) · strip (marquee) · sticky editorial split (problem) · bento (services) · pinned stage (under the lens) · horizontal timeline (process) · document (report) · editorial index (why) · rail (testimonials) · feed grid (Instagram) · sticky accordion (FAQ) · navy plate (final CTA).
+- **Layout families, one per section:** framed photo plate (hero) · centred manifesto (statement) · strip (marquee) · sticky editorial split (problem) · bento (services) · sticky stage (under the lens) · horizontal timeline (process) · document (report) · editorial index (why) · rail (testimonials) · feed grid (Instagram) · sticky accordion (FAQ) · navy plate (final CTA).
 - **Eyebrows (4 in total):** hero, "What we check", "Vehicle Health Report", "@autolensac".
 
 ---
@@ -137,7 +137,7 @@ Rules:
 | Statement | GSAP SplitText (`words`) | scrub | words sharpen from soft grey (AA) to ink | full ink |
 | Models marquee | CSS | perpetual | 60 s loop; pause button; paused offscreen | static wrapped list |
 | Reveals (problem, services, why, Instagram) | CSS + shared IntersectionObserver | enter | fade up 24 px, staggered | visible |
-| Under the lens | GSAP pin + scrub (≥ 1024 px) / state (mobile) | scroll / swipe / click | loupe travels between hotspots, list highlights, final "ready" seal | click-select, no pin |
+| Under the lens | CSS sticky + GSAP scrub (≥ 1024 × 560 px) / state (mobile) | scroll / swipe / click | loupe travels between hotspots, list highlights, final "ready" seal | click-select, not sticky |
 | Process | GSAP scrub | scroll | line draws, nodes focus | full line |
 | Report | GSAP timeline (once) | enter | scan sweep, rows print, checks draw, highlighter wipes | static |
 | FAQ | CSS (grid-rows) | click | height + opacity | instant |
@@ -150,15 +150,18 @@ Rules:
 - **Motion stays off the critical path.** The hero (intro, aperture veil, line reveals, chips) is pure CSS, so it plays before any JavaScript arrives. Everything else waits for a "motion ready" switch (`lib/motion/ready.ts`), which flips on the first input (pointer, scroll, key, touch) or 2.5s after the page has loaded. Only then are these mounted, as code-split `next/dynamic` components:
   - Lenis, GSAP, ScrollTrigger and the cursor lens (`components/motion/MotionEngine.tsx`)
   - the scroll scenes (`components/motion/scene-effects.tsx`)
-  - the inspector's pin (`InspectorPin.tsx`)
+  - the inspector's scroll scrub (`InspectorPin.tsx`)
   - the Motion mobile menu (`components/layout/MobileMenu.tsx`)
 - Lenis (`autoRaf: false`) is driven by `gsap.ticker`; `lenis.on('scroll', ScrollTrigger.update)`, `lagSmoothing(0)`. Touch keeps native scrolling (`syncTouch: false`). Lenis isn't created under reduced motion, and it stops while the mobile menu is open.
 - GSAP plugins are registered once in `lib/gsap.ts`. Every scene uses `useGSAP({ scope })` with `contextSafe`, gated by `gsap.matchMedia()`.
-- Section setups run through `lib/motion/scheduler.ts`: queued in page order, run in idle time, then `ScrollTrigger.sort()` + `refresh()`. They refresh again after fonts load.
+- Section setups run through `lib/motion/scheduler.ts`: queued in page order, run in idle time, then `ScrollTrigger.sort()` + `refresh()`. They refresh again after fonts load. `scheduleMotion()` returns a cancel function that every scene calls on unmount: React Strict Mode mounts effects twice in development, and a queued setup that outlives its component builds the scene twice (doubled SplitText, fighting timelines, stuck pins).
+- **No GSAP pins.** The inspector's panel is CSS `position: sticky` inside a section that reserves its own scroll length (440svh), and GSAP only scrubs the timeline. Nothing is inserted into the page when the motion code arrives, so a reload mid-page or a nav link clicked early lands in the right place.
+- **Short screens.** Laptops at 125–150% display scaling leave only 560–730px of height. Nothing sticky may be taller than the screen it is on: the inspector sticks only at ≥ 560px tall (`pin-ok` variant / `MQ_PIN`) and its copy scales with `svh`; sticky columns use the `tall` variant (≥ 820px) or cap their height with `svh`; the hero chips share the band above the copy and drop out through container queries instead of covering the headline; section padding uses `section-y-*` (the usual spacing, capped at a share of the screen height).
 - `ScrollTrigger.config({ ignoreMobileResize: true })`. No markers in production. The navbar reads scroll position from the engine (`lib/motion/scroll-store.ts`); there are no raw scroll listeners.
 - **Motion vs CSS.** Motion (`motion/react`) powers the mobile menu sheet: AnimatePresence, spring physics, staggered links. Simple state changes use CSS transitions with the same easing tokens: navbar hide/shrink, hamburger morph, FAQ height, WhatsApp button. GSAP and Motion never animate the same element.
-- Budgets: 1 pinned section, 0 WebGL scenes, no animated `filter`, `will-change` only on the veil and loupe.
-- **Measured:** Lighthouse mobile (placeholder images) gave Performance 91, Accessibility 100, Best Practices 100, SEO 100. CLS 0.002, TBT ≤ 80ms.
+- Budgets: 1 sticky scroll scene, 0 WebGL scenes, no animated `filter`, `will-change` only on the veil and loupe.
+- **Measured:** Lighthouse mobile (placeholder images) gave Performance 91, Accessibility 100, Best Practices 100, SEO 100. CLS 0.002, TBT ≤ 80ms on a quiet machine. Local runs swing with machine load, so compare against a baseline build measured in the same session before calling a regression.
+- Reveal styles never put a transition on the hidden state: hiding is instant and only the reveal animates (otherwise every offscreen block starts a transition, and fires transition events through React, the moment the observer switches on).
 
 **The 3 wow moments + 1 clever detail**
 1. Hero lens-focus reveal.
@@ -173,7 +176,7 @@ Rules:
 - WCAG AA contrast on all text (table above). Visible focus on every interactive element. Skip link. One `h1`, one `h2` per section, landmarks, `lang="en-IN"`.
 - 44 px minimum touch targets. Mobile menu: `aria-expanded` / `aria-controls`, dialog semantics, background set `inert`, Esc closes, focus returns to the toggle.
 - Moving content: marquee has a pause control (WCAG 2.2.2). Rails have previous/next buttons. Nothing flashes.
-- `prefers-reduced-motion`: no Lenis, no pin, no parallax, no intro, no cursor; content fully visible. `prefers-reduced-transparency`: solid surfaces.
+- `prefers-reduced-motion`: no Lenis, no sticky scroll scene, no parallax, no intro, no cursor; content fully visible. `prefers-reduced-transparency`: solid surfaces.
 - Images: `next/image` / `getImageProps`, static imports (hashed URLs, automatic blur placeholders), exact `sizes`, AVIF/WebP. Only the hero is high priority.
 - Budgets: first-load JS ≤ ~180 KB gz, LCP < 2.5 s, CLS < 0.05, no third-party scripts, Lighthouse mobile ≥ 90 / ≥ 95 / ≥ 95 / ≥ 95.
 
@@ -186,13 +189,13 @@ Rules:
 - Keep one accent colour and one radius system everywhere.
 - Write plain-language copy with one idea per sentence.
 - Flag every unconfirmed fact as a TODO in `content/site.ts`.
-- Test every change at 360 px and with reduced motion.
+- Test every change at 360 px, at a short laptop size (1280 × 577) and with reduced motion.
 
 **Don't**
 - ❌ Em-dashes or en-dashes in visible copy.
 - ❌ Fake reviews, fake counters, invented prices, point counts or durations.
 - ❌ Car-maker logos or badges (model names as plain text only).
-- ❌ More than one marquee, more than one pinned section, any WebGL.
+- ❌ More than one marquee, more than one sticky scroll scene, any WebGL.
 - ❌ Equal three-card rows, list rows with a border on every line, scroll cues, section-number eyebrows.
 - ❌ Pills or captions overlaid on photos (except the semantic hero report chips).
 - ❌ Animating `top/left/width/height` or `filter`, or raw `window` scroll listeners.

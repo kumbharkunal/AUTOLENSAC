@@ -7,7 +7,7 @@ import { whatsappHref } from "@/lib/links";
 export function Faq() {
   const { faq } = site;
   return (
-    <section id={faq.id} aria-labelledby="faq-title" className="py-24 sm:py-32 lg:py-40">
+    <section id={faq.id} aria-labelledby="faq-title" className="section-y-24 sm:section-y-32 lg:section-y-40">
       <Container className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">

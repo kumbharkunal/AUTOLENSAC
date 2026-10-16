@@ -42,7 +42,7 @@ export const IMAGE_SPECS = [
     height: 1024,
     position: "centre",
     usage: "Services: engine & battery health check",
-    placeholder: "macro",
+    placeholder: "still-tablet",
   },
   {
     name: "paint-gauge",
@@ -50,7 +50,7 @@ export const IMAGE_SPECS = [
     height: 1280,
     position: "centre",
     usage: "Problem section, Services: accident & paint",
-    placeholder: "macro-portrait",
+    placeholder: "still-gauge",
   },
   {
     name: "handover",
@@ -58,7 +58,7 @@ export const IMAGE_SPECS = [
     height: 1280,
     position: "centre",
     usage: "Why AutoLens",
-    placeholder: "warm-portrait",
+    placeholder: "still-handover",
   },
   {
     name: "bike-inspection",
@@ -74,7 +74,7 @@ export const IMAGE_SPECS = [
     height: 1024,
     position: "centre",
     usage: "Problem section, Instagram strip",
-    placeholder: "macro-square",
+    placeholder: "still-tyre",
   },
   {
     name: "cta-bg",
