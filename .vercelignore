@@ -1,0 +1,3 @@
+# Not needed to build the site (raw PNGs are already exported to public/images)
+/raw-images
+/.claude
