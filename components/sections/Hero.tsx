@@ -9,6 +9,9 @@ import { telHref, whatsappHref } from "@/lib/links";
 
 type CSSVars = React.CSSProperties & Record<`--${string}`, string | number>;
 
+/** When the wide hero photo is used (must match `md:landscape:` here and `.hero-veil` in globals.css). */
+const HERO_WIDE = "(min-width: 768px) and (orientation: landscape)";
+
 /** Shared focal point (where the lens opens) for the hero and the intro overlay. */
 export function heroFocalVars(): CSSVars {
   const { focal } = site.hero;
@@ -92,24 +95,31 @@ export function Hero() {
       {/* Two rows: the chip band takes whatever height the copy leaves (a grid row, not a flex
           item: Chrome only resolves the band's size container queries reliably in grid). */}
       <HeroMotion className="relative isolate grid min-h-[calc(100svh-16px)] grid-rows-[minmax(6rem,1fr)_auto] overflow-hidden rounded-[24px] bg-sand sm:min-h-[calc(100svh-24px)] md:rounded-[36px]">
-        {/* Photograph (the LCP element: painted immediately, under the veil) */}
+        {/*
+          Photograph (the LCP element: painted immediately, under the veil). Art-directed by shape:
+          the wide shot on landscape screens from 768px, the portrait shot on phones and portrait
+          tablets. The wide shot keeps its subject on the right, clear of the headline.
+        */}
         <div data-hero-media className="hero-media absolute inset-x-0 -top-[12%] bottom-0">
           <picture>
-            <source media="(min-width: 768px)" srcSet={desktopSrcSet} sizes="100vw" />
+            <source media={HERO_WIDE} srcSet={desktopSrcSet} sizes="100vw" />
             <img
               {...mobileImg}
               srcSet={mobileSrcSet}
               alt={hero.imageAlt}
-              className="h-full w-full object-cover object-[50%_40%] md:object-[60%_45%]"
+              className="h-full w-full object-cover object-[50%_20%] md:landscape:object-[100%_30%]"
             />
           </picture>
         </div>
 
         {/* Defocus veil: the photo's own blur placeholder, opened by the lens aperture */}
         <div className="hero-veil" aria-hidden="true">
-          <span className="hero-veil__img md:hidden" style={{ backgroundImage: `url(${images.heroMobile.blurDataURL})` }} />
           <span
-            className="hero-veil__img hidden md:block"
+            className="hero-veil__img md:landscape:hidden"
+            style={{ backgroundImage: `url(${images.heroMobile.blurDataURL})` }}
+          />
+          <span
+            className="hero-veil__img hidden md:landscape:block"
             style={{ backgroundImage: `url(${images.heroDesktop.blurDataURL})` }}
           />
         </div>
@@ -126,14 +136,15 @@ export function Hero() {
           leaves too little room, chips drop out (container queries in globals.css).
         */}
         <div aria-hidden="true" className="hero-chips relative z-[5]">
-          <div className="hero-chips__band hidden md:flex">
+          {/* Chip layouts follow the photo in use (wide on landscape screens, portrait otherwise) */}
+          <div className="hero-chips__band hidden md:landscape:flex">
             {hero.chips.map((chip, index) => (
               <div key={chip.label} data-depth={40 + index * 26} data-chip={index + 1} style={chipPlacement(chip.desktop)}>
                 <Chip label={chip.label} value={chip.value} index={index} />
               </div>
             ))}
           </div>
-          <div className="hero-chips__band flex md:hidden">
+          <div className="hero-chips__band flex md:landscape:hidden">
             {hero.chips.map((chip, index) =>
               chip.mobile ? (
                 <div key={chip.label} data-depth={24 + index * 18} data-chip={index + 1} style={chipPlacement(chip.mobile)}>
@@ -151,7 +162,7 @@ export function Hero() {
             className="absolute inset-x-0 -top-20 bottom-0 -z-10 bg-linear-to-t from-cream from-12% via-cream/80 via-45% to-transparent md:from-cream/95"
           />
           <p
-            className="hero-fade mb-5 inline-flex items-center gap-2 font-mono text-[10.5px] leading-none font-medium tracking-[0.1em] whitespace-nowrap text-ink/70 uppercase min-[400px]:text-[11px] sm:mb-7 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.16em]"
+            className="hero-fade hero-eyebrow mb-5 inline-flex items-center gap-2 font-mono text-[10.5px] leading-none font-medium tracking-[0.1em] whitespace-nowrap text-ink/70 uppercase min-[400px]:text-[11px] sm:mb-7 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.16em]"
             style={{ "--d": "0.2s" } as CSSVars}
           >
             <LensMark className="h-3.5 w-3.5" />

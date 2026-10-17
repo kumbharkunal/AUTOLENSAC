@@ -1,21 +1,23 @@
 # raw-images
 
-Drop the PNGs you generate with ChatGPT here, using these exact names (prompts in `../IMAGE_PROMPTS.md`):
+Drop the images you generate here, using these exact names (prompts in `../IMAGE_PROMPTS.md`).
+PNG, JPG or WebP all work, at any size or shape: the script fits each one to its slot.
 
-| File | ChatGPT size | Becomes |
+| File | Suggested size | What the script does |
 |---|---|---|
-| `hero-desktop.png` | 1536×1024 | `public/images/hero-desktop.webp/.avif` |
-| `hero-mobile.png` | 1024×1536 | `public/images/hero-mobile.webp/.avif` |
-| `lens-car.png` | 1536×1024 | `public/images/lens-car.webp/.avif` |
-| `diagnostic-tablet.png` | 1536×1024 | `public/images/diagnostic-tablet.webp/.avif` |
-| `paint-gauge.png` | 1024×1536 | `public/images/paint-gauge.webp/.avif` (cropped to 4:5) |
-| `handover.png` | 1024×1536 | `public/images/handover.webp/.avif` (cropped to 4:5) |
-| `bike-inspection.png` | 1024×1024 | `public/images/bike-inspection.webp/.avif` |
-| `lens-bike.png` | 1536×1024 | `public/images/lens-bike.webp/.avif` |
-| `og-photo.png` | 1536×1024 | `public/images/og-photo.jpg/.webp/.avif` (cropped to 1200×630) |
-| `detail-vin-tyre.png` | 1024×1024 | `public/images/detail-vin-tyre.webp/.avif` |
-| `cta-bg.png` | 1536×1024 | `public/images/cta-bg.webp/.avif` |
+| `hero-desktop.png` | 1536×1024 or 16:9 | Keeps the whole photo and adds soft ceiling and window light on the left, so the subject sits right of the headline (landscape screens) |
+| `hero-mobile.png` | 1024×1536 or 9:16 | Keeps the whole photo (phones and portrait tablets) |
+| `lens-car.png` | 1536×1024 or wider | Fits it into the 3:2 "Under the lens" stage and extends the studio backdrop |
+| `lens-bike.png` | 1536×1024 or wider | Same as the car |
+| `diagnostic-tablet.png` | 1536×1024 | Keeps the whole photo |
+| `paint-gauge.png` | 1024×1536 | Keeps the whole photo |
+| `handover.png` | 1024×1536 | Keeps the whole photo |
+| `bike-inspection.png` | 1024×1024 | Keeps the whole photo |
+| `detail-vin-tyre.png` | 1024×1024 | Keeps the whole photo |
+| `cta-bg.png` | 1536×1024 | Keeps the whole photo |
+| `og-photo.png` | 1536×1024 or 2:1 | Crops to 1200×630 from the left (keep the subject on the right) |
 
 Then run `npm run images` (or `npm run images -- hero-desktop hero-mobile` for just some), commit `public/images` and redeploy.
+If you replace `lens-car` or `lens-bike`, re-check the hotspot positions (README, "Calibrate the hotspots").
 
-The PNGs in this folder are ignored by git on purpose; only the optimized files are committed.
+The images in this folder are ignored by git on purpose; only the optimized files are committed.

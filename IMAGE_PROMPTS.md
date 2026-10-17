@@ -7,7 +7,7 @@ Eleven photographs, listed in **priority order** (the first three carry most of 
 1. Open a **new** ChatGPT chat for each image and paste the whole prompt block. Every prompt is self-contained.
 2. Ask for the exact size listed (ChatGPT's native sizes: 1536×1024 landscape, 1024×1536 portrait, 1024×1024 square).
 3. Download the result as **PNG** and save it in `/raw-images` with the exact file name shown (e.g. `raw-images/hero-desktop.png`).
-4. Run `npm run images`. The script crops and resizes to the final size and writes **WebP + AVIF** into `/public/images` (and a JPEG for the share image).
+4. Run `npm run images`. Any size or shape works: the script keeps each whole photo (only the share photo is cropped), extends the backdrop where a slot needs room (the desktop hero and the two studio shots), and writes **WebP + AVIF** into `/public/images` (and a JPEG for the share image).
 5. Commit and redeploy. For the two "Under the lens" photos, check the hotspot positions afterwards (see README, "Calibrating hotspots").
 
 If a result has text, logos, odd hands or extra wheels, regenerate. Don't fix it in post.
@@ -19,7 +19,7 @@ Palette used in every prompt: cream `#F4EDE2`, ivory `#FBF8F2`, sand `#E6DCCB`, 
 ## 1. Hero, desktop
 
 - **File:** `raw-images/hero-desktop.png` → `public/images/hero-desktop.webp` / `.avif`
-- **ChatGPT size:** 1536×1024 (3:2 landscape). **Final export:** 1536×1024 (no crop). Shown full-bleed in a rounded frame on screens 768px and wider, cropped slightly at the top and bottom.
+- **ChatGPT size:** 1536×1024 (3:2 landscape). **Final export:** the whole photo, plus soft extra ceiling and window light on the left (added by the script), so the subject sits to the right of the headline and below the navigation. Shown full-bleed in a rounded frame on landscape screens 768px and wider.
 - **Download:** PNG. **Final:** WebP + AVIF (via `npm run images`).
 - **Variant:** desktop only. The phone version is image 2.
 
@@ -47,7 +47,7 @@ Strictly avoid: any text, letters or numbers anywhere; lettering on clothing; wa
 ## 2. Hero, mobile
 
 - **File:** `raw-images/hero-mobile.png` → `public/images/hero-mobile.webp` / `.avif`
-- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** 1024×1536 (no crop). Shown full-bleed on phones (under 768px wide).
+- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** the whole photo. Shown full-bleed on phones and portrait tablets.
 - **Download:** PNG. **Final:** WebP + AVIF.
 - **Variant:** mobile only (the desktop version is image 1).
 
@@ -74,7 +74,7 @@ Strictly avoid: any text, letters or numbers; lettering on clothing; watermarks;
 ## 3. Under the lens: car
 
 - **File:** `raw-images/lens-car.png` → `public/images/lens-car.webp` / `.avif`
-- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024 (no crop). Shown inside a 3:2 stage. A magnifying loupe moves over it at 2.2× zoom, so it must be sharp everywhere.
+- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024; a wider shot is fitted inside and its studio backdrop extended, so the whole car stays in view. Shown inside a 3:2 stage. A magnifying loupe moves over it at 2.2× zoom, so it must be sharp everywhere.
 - **Download:** PNG. **Final:** WebP + AVIF.
 - **Hotspots** (you can fine-tune them later with `?hotspots`): rear door paint ~62%/50%, side window ~53%/43%, headlight ~17%/52%, bonnet ~28%/47%, front wheel ~27%/68%, lower door ~45%/60%.
 
@@ -103,7 +103,7 @@ Strictly avoid: any text, letters or numbers; logos, badges or emblems on the gr
 ## 4. Diagnostic tablet close-up
 
 - **File:** `raw-images/diagnostic-tablet.png` → `public/images/diagnostic-tablet.webp` / `.avif`
-- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024. Shown as the large photo in the "Engine & battery health check" service card, cropped to about 16:10, so keep the subject centred.
+- **ChatGPT size:** 1536×1024 (3:2). **Final export:** the whole photo. Shown as the large photo in the "Engine & battery health check" service card, cropped to about 16:10, so keep the subject centred.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```
@@ -125,7 +125,7 @@ Strictly avoid: any readable text, numbers or brand names on the tablet, cable o
 ## 5. Paint-thickness gauge macro
 
 - **File:** `raw-images/paint-gauge.png` → `public/images/paint-gauge.webp` / `.avif`
-- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** 1024×1280 (4:5, cropped evenly top and bottom). Also shown as a wider crop in the "Accident & paint inspection" card, so keep the subject in the centre.
+- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** the whole photo. Shown in the "Accident & paint inspection" card (tall and wide crops) and the Instagram strip, so keep the subject in the centre.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```
@@ -147,7 +147,7 @@ Strictly avoid: any readable text, numbers or brand names; car logos; watermarks
 ## 6. Handover (hands and keys)
 
 - **File:** `raw-images/handover.png` → `public/images/handover.webp` / `.avif`
-- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** 1024×1280 (4:5, cropped evenly). Shown as a portrait in the "Why AutoLens" section.
+- **ChatGPT size:** 1024×1536 (2:3 portrait). **Final export:** the whole photo. Shown as a 4:5 portrait in the "Why AutoLens" section.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```
@@ -169,7 +169,7 @@ Strictly avoid: any text, letters or numbers; logos on the key fob; jewellery wi
 ## 7. Bike inspection
 
 - **File:** `raw-images/bike-inspection.png` → `public/images/bike-inspection.webp` / `.avif`
-- **ChatGPT size:** 1024×1024 (square). **Final export:** 1024×1024. Shown in the "Hidden-problem detection" service card (square on phones, a tall crop on desktop) and in the Instagram strip, so keep the subject centred.
+- **ChatGPT size:** 1024×1024 (square). **Final export:** the whole photo. Shown in the "Hidden-problem detection" service card (square on phones, a tall crop on desktop) and in the Instagram strip, so keep the subject centred.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```
@@ -191,7 +191,7 @@ Strictly avoid: any text, letters or numbers; logos, badges or tank decals of an
 ## 8. Under the lens: bike
 
 - **File:** `raw-images/lens-bike.png` → `public/images/lens-bike.webp` / `.avif`
-- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024 (no crop). Shown inside a 3:2 stage with a 2.2× magnifying loupe, so it must be sharp everywhere.
+- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024; a wider shot is fitted inside and its studio backdrop extended, so the whole bike stays in view. Shown inside a 3:2 stage with a 2.2× magnifying loupe, so it must be sharp everywhere.
 - **Download:** PNG. **Final:** WebP + AVIF.
 - **Hotspots** (fine-tune later with `?hotspots`): fuel tank ~47%/46%, headlight and handlebar ~36%/47%, engine ~52%/58%, front wheel ~33%/65%, rear frame ~70%/50%, rear wheel area ~60%/66%.
 
@@ -220,7 +220,7 @@ Strictly avoid: any text, letters or numbers; logos, badges, tank decals or bran
 ## 9. Social share image (Open Graph)
 
 - **File:** `raw-images/og-photo.png` → `public/images/og-photo.webp` / `.avif` / `.jpg`
-- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1200×630 (cropped evenly top and bottom to 1.91:1). The AutoLens logo, the headline "Don't buy a vehicle without PDI." and the phone number are added by code on the left side.
+- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1200×630 (cropped from the left, so keep the subject on the right). The AutoLens logo, the headline "Don't buy a vehicle without PDI." and the phone number are added by code on the left side.
 - **Download:** PNG. **Final:** JPEG (used by the share card) + WebP + AVIF.
 
 ```
@@ -245,7 +245,7 @@ Strictly avoid: any text, letters or numbers; lettering on clothing; watermarks;
 ## 10. Tyre date-code macro
 
 - **File:** `raw-images/detail-vin-tyre.png` → `public/images/detail-vin-tyre.webp` / `.avif`
-- **ChatGPT size:** 1024×1024 (square). **Final export:** 1024×1024. Shown in the "What a showroom shine can hide" section (cropped to 4:5 on desktop) and in the Instagram strip, so keep the subject centred.
+- **ChatGPT size:** 1024×1024 (square). **Final export:** the whole photo. Shown in the "What a showroom shine can hide" section (cropped to 4:5 on desktop) and in the Instagram strip, so keep the subject centred.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```
@@ -267,7 +267,7 @@ Strictly avoid: readable text, letters, numbers or brand names on the tyre or wh
 ## 11. Final call-to-action background
 
 - **File:** `raw-images/cta-bg.png` → `public/images/cta-bg.webp` / `.avif`
-- **ChatGPT size:** 1536×1024 (3:2). **Final export:** 1536×1024. Shown at about 20% opacity behind ivory text on a deep navy panel, so it is a texture, not a hero.
+- **ChatGPT size:** 1536×1024 (3:2). **Final export:** the whole photo. Shown at about 20% opacity behind ivory text on a deep navy panel, so it is a texture, not a hero.
 - **Download:** PNG. **Final:** WebP + AVIF.
 
 ```

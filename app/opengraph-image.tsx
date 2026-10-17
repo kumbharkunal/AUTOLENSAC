@@ -1,11 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { site } from "@/content/site";
 
 export const alt = "AutoLens: Pre-Delivery Inspection and Vehicle Consultancy for cars and bikes";
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+// JPEG, not PNG: with a real photo the PNG is ~800 KB, and WhatsApp skips link-preview images much
+// over 300 KB. The card is rendered once at build time, so the conversion costs nothing per visit.
+export const contentType = "image/jpeg";
 
 const LENS_MARK = `data:image/svg+xml;base64,${Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M31.6 31.6 42 42" stroke="#0B1438" stroke-width="5.6" stroke-linecap="round" fill="none"/><circle cx="21" cy="21" r="14.2" stroke="#0B1438" stroke-width="5.2" fill="none"/><circle cx="21" cy="21" r="7.6" fill="#1A47D1"/><circle cx="18.2" cy="18.2" r="2.1" fill="#fff" fill-opacity="0.85"/></svg>`,
@@ -25,7 +28,17 @@ const [serif, serifItalic, sans, photo] = await Promise.all([
 ]);
 const photoSrc = photo ? `data:image/jpeg;base64,${photo.toString("base64")}` : null;
 
-export default async function Image() {
+// The finished card is also made once, at module evaluation: work awaited inside the handler would
+// make the route render per request instead of being prerendered.
+const card = await sharp(Buffer.from(await render().arrayBuffer()))
+  .jpeg({ quality: 84, mozjpeg: true, chromaSubsampling: "4:4:4" })
+  .toBuffer();
+
+export default function Image() {
+  return new Response(new Uint8Array(card), { headers: { "Content-Type": contentType } });
+}
+
+function render() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", backgroundColor: "#F4EDE2" }}>

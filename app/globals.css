@@ -212,7 +212,8 @@ html.intro-skip .intro {
   animation: intro-lens 1.05s var(--ease-out) both;
 }
 
-@media (min-width: 768px) {
+/* The wide hero photo (and its focal point) is used on landscape screens from 768px: see Hero.tsx. */
+@media (min-width: 768px) and (orientation: landscape) {
   .intro__lens {
     left: var(--fx-d);
     top: var(--fy-d);
@@ -279,7 +280,7 @@ html.intro-skip .intro {
     veil-out 0.4s linear calc(var(--hero-delay) + 1s) both;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (orientation: landscape) {
   .hero-veil {
     --ax: var(--fx-d);
     --ay: var(--fy-d);
@@ -342,6 +343,17 @@ html.intro-skip .intro {
     opacity: 0;
     transform: translate3d(0, 16px, 0);
   }
+}
+
+/* Small type over the photograph: a soft cream halo keeps it legible over busy detail. */
+.hero-eyebrow {
+  text-shadow:
+    0 0 2px rgb(244 237 226 / 0.9),
+    0 0 12px rgb(244 237 226 / 0.95);
+}
+
+.hero-eyebrow svg {
+  filter: drop-shadow(0 0 4px rgb(244 237 226 / 0.95));
 }
 
 .hero-title--mobile {

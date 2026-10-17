@@ -114,15 +114,15 @@ export const site = {
     },
     subtitle: "Expert computerized car & bike diagnosis before delivery.",
     imageAlt:
-      "An AutoLens inspector holding a diagnostic tablet beside a new SUV in a bright dealership delivery bay",
+      "An AutoLens inspector with a diagnostic tablet checking a new white SUV in a bright showroom",
     /**
      * Glass "report" chips floating over the photograph, top to bottom. They share the space between
      * the navigation and the headline (spaced automatically, so they never cover the text).
      * `x` = % from the left edge, `r` = % from the right edge. On short screens the last chips drop out.
      */
     chips: [
-      { label: "Engine status", value: "Good", desktop: { x: 62 }, mobile: { x: 6 } },
-      { label: "Accident check", value: "Clear", desktop: { r: 5 }, mobile: { r: 6 } },
+      { label: "Engine status", value: "Good", desktop: { x: 62 }, mobile: { x: 5 } },
+      { label: "Accident check", value: "Clear", desktop: { r: 5 }, mobile: { x: 12 } },
       { label: "Odometer", value: "Verified", desktop: { x: 64 }, mobile: null },
     ] as {
       label: string;
@@ -158,7 +158,7 @@ export const site = {
   problem: {
     title: "What a showroom shine can hide.",
     body: "New doesn't always mean flawless. Before it reaches you, a vehicle is transported, stored and handled many times, and small problems are easy to miss on delivery day.",
-    imageAlt: "Close-up of a new tyre's sidewall and its DOT manufacturing date code",
+    imageAlt: "A finger pointing to the DOT date code on a new tyre's sidewall",
     findings: [
       {
         icon: "truck",
@@ -208,14 +208,14 @@ export const site = {
         icon: "engine",
         title: "Engine & battery health check",
         body: "Computerized diagnosis of engine status, fault codes and battery condition before you accept delivery.",
-        imageAlt: "A technician's hand holding a diagnostic tablet connected to a new car's OBD port",
+        imageAlt: "A technician holding a diagnostic tablet plugged into a new car's OBD port",
       },
       {
         id: "paint",
         icon: "paint",
         title: "Accident & paint inspection",
         body: "Panel-by-panel checks for repaints, filler and transit damage.",
-        imageAlt: "Close-up of a paint thickness gauge on a glossy car panel",
+        imageAlt: "A paint thickness gauge held against the door of a new blue car",
       },
       {
         id: "odometer",
@@ -262,7 +262,7 @@ export const site = {
       {
         id: "car",
         label: "Cars",
-        imageAlt: "Side profile of a new compact SUV on a cream studio background",
+        imageAlt: "Side profile of a new white compact SUV on a cream studio background",
         checkpoints: [
           {
             id: "exterior",
@@ -271,7 +271,7 @@ export const site = {
             body: "Every panel checked for repaints, dents, scratches and uneven gaps.",
             icon: "paint",
             x: 0.62,
-            y: 0.5,
+            y: 0.56,
           },
           {
             id: "interior",
@@ -279,8 +279,8 @@ export const site = {
             readout: "Trim / upholstery / fitment",
             body: "Seats, trim, dashboard and fitment inspected for marks and defects.",
             icon: "armchair",
-            x: 0.53,
-            y: 0.43,
+            x: 0.47,
+            y: 0.37,
           },
           {
             id: "electrical",
@@ -288,8 +288,8 @@ export const site = {
             readout: "Lights / sensors / ECU scan",
             body: "Lights, infotainment, sensors and controls tested, with a full computerized scan.",
             icon: "headlights",
-            x: 0.17,
-            y: 0.52,
+            x: 0.135,
+            y: 0.505,
           },
           {
             id: "fluids",
@@ -297,8 +297,8 @@ export const site = {
             readout: "Engine oil / coolant / brake",
             body: "Engine oil, coolant, brake and washer fluids verified under the bonnet.",
             icon: "drop",
-            x: 0.28,
-            y: 0.47,
+            x: 0.22,
+            y: 0.45,
           },
           {
             id: "tyres",
@@ -306,8 +306,8 @@ export const site = {
             readout: "DOT date / pressure / rims",
             body: "Tyre manufacturing dates, pressure, tread and rims checked on every wheel.",
             icon: "tire",
-            x: 0.27,
-            y: 0.68,
+            x: 0.22,
+            y: 0.69,
           },
           {
             id: "road",
@@ -315,8 +315,8 @@ export const site = {
             readout: "Brakes / steering / test",
             body: "A final assessment that the vehicle is safe and ready for the road.",
             icon: "steering",
-            x: 0.45,
-            y: 0.6,
+            x: 0.765,
+            y: 0.69,
           },
         ] as Checkpoint[],
       },
@@ -324,7 +324,7 @@ export const site = {
         // TODO: confirm with client: bike checklist adapted from the car checklist.
         id: "bike",
         label: "Bikes",
-        imageAlt: "Side profile of a new motorcycle on a cream studio background",
+        imageAlt: "Side profile of a new blue motorcycle on a cream studio background",
         checkpoints: [
           {
             id: "body",
@@ -332,8 +332,8 @@ export const site = {
             readout: "Tank / panels / finish",
             body: "Tank, panels and fenders checked for scratches, dents and repaints.",
             icon: "paint",
-            x: 0.47,
-            y: 0.46,
+            x: 0.43,
+            y: 0.39,
           },
           {
             id: "controls",
@@ -341,8 +341,8 @@ export const site = {
             readout: "Lights / horn / indicators",
             body: "Headlamp, indicators, horn, switches and the instrument cluster tested.",
             icon: "headlights",
-            x: 0.36,
-            y: 0.47,
+            x: 0.27,
+            y: 0.37,
           },
           {
             id: "engine",
@@ -350,8 +350,8 @@ export const site = {
             readout: "Oil / leaks / idle",
             body: "Engine oil, leaks, battery and idle behaviour checked.",
             icon: "drop",
-            x: 0.52,
-            y: 0.58,
+            x: 0.45,
+            y: 0.6,
           },
           {
             id: "tyres",
@@ -359,8 +359,8 @@ export const site = {
             readout: "DOT date / pads / pressure",
             body: "Tyre dates and pressure, brake feel and wheel alignment inspected.",
             icon: "tire",
-            x: 0.33,
-            y: 0.65,
+            x: 0.22,
+            y: 0.66,
           },
           {
             id: "chassis",
@@ -368,7 +368,7 @@ export const site = {
             readout: "Frame no. / engine no.",
             body: "Chassis and engine numbers matched against your invoice and papers.",
             icon: "barcode",
-            x: 0.7,
+            x: 0.64,
             y: 0.5,
           },
           {
@@ -377,7 +377,7 @@ export const site = {
             readout: "Brakes / steering / test",
             body: "A final assessment that the bike is safe and ready for the road.",
             icon: "steering",
-            x: 0.6,
+            x: 0.75,
             y: 0.66,
           },
         ] as Checkpoint[],

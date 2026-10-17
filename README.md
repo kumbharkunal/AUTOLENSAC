@@ -3,7 +3,7 @@
 A pitch homepage for **AutoLens** ([@autolensac](https://www.instagram.com/autolensac/)), a pre-delivery inspection (PDI) and vehicle consultancy for new cars and bikes. Light, editorial and photography-led, built around the idea of a lens: the page arrives slightly out of focus and resolves into clarity.
 
 - **Stack:** Next.js 16.4 (App Router, TypeScript), Tailwind CSS 4, GSAP 3.15 (ScrollTrigger, SplitText, `@gsap/react`), Lenis, Motion, Phosphor icons. Deploys to Vercel with no environment variables.
-- **Measured** (Lighthouse mobile, local production build, placeholder images): Performance 91 · Accessibility 100 · Best Practices 100 · SEO 100 (CLS ≤ 0.002). Local Performance scores swing with how busy the laptop is (the same build scored 76–83 on a busy day), so confirm on the deployed URL with PageSpeed Insights.
+- **Measured** (Lighthouse mobile, local production build): Performance 91 with placeholder images on a quiet laptop · Accessibility 100 · Best Practices 100 · SEO 100 (CLS ≤ 0.002). The real photos add about 35 KB to the phone hero (AVIF). Local Performance scores swing widely with how busy the laptop is (the same build has scored anywhere from 39 to 91), so measure the deployed URL with PageSpeed Insights.
 - **Research and design docs:** [`research/client-brief.md`](research/client-brief.md) · [`research/design-rules.md`](research/design-rules.md) · [`IMAGE_PROMPTS.md`](IMAGE_PROMPTS.md)
 
 ---
@@ -40,25 +40,29 @@ Anything unconfirmed is marked `// TODO: confirm with client` in that file and l
 
 ---
 
-## Add the real photographs
+## Photographs
 
-The site ships with on-palette placeholder images at the exact final paths (soft scenes for the wide shots, simple illustrations for the close-ups), so it already looks finished. To replace them:
+The site uses eleven photographs generated with the prompts in [`IMAGE_PROMPTS.md`](IMAGE_PROMPTS.md). They are AI-generated stand-ins (see the client list below). To replace any of them:
 
 1. Generate each image in ChatGPT with the prompts in **[`IMAGE_PROMPTS.md`](IMAGE_PROMPTS.md)**. They are listed in priority order and each one is self-contained.
-2. Save the PNGs in **`/raw-images`** with the exact names given (e.g. `raw-images/hero-desktop.png`). The PNGs themselves are not committed.
+2. Save them in **`/raw-images`** with the exact names given (e.g. `raw-images/hero-desktop.png`). Any size or shape works. The raw files themselves are not committed.
 3. Run:
    ```bash
    npm run images                         # every image found in /raw-images
    npm run images -- hero-desktop lens-car  # or just some of them
    ```
-   This crops and resizes each image to its final size and writes **WebP + AVIF** to `/public/images` (plus a JPEG for the share image). `next/image` then serves AVIF/WebP at every screen size.
+   This fits each photo to its slot and writes **WebP + AVIF** to `/public/images` (plus a JPEG for the share image). `next/image` then serves AVIF/WebP at every screen size. How each photo is fitted is set per image in `scripts/image-specs.mjs`:
+   - **inside** (most photos): the whole photo is kept and the page crops it to each layout.
+   - **pad** (the two "Under the lens" studio shots): the photo is fitted into the 3:2 stage and its studio backdrop extended, so the whole vehicle stays in view.
+   - **extend** (desktop hero): soft extra ceiling and window light are added to a tightly framed shot, so the subject sits right of the headline and below the navigation.
+   - **cover** (share photo): cropped to exactly 1200×630.
 4. Commit `public/images` and redeploy.
 
-The sizes and crop positions live in `scripts/image-specs.mjs`. To regenerate the placeholders: `npm run images:placeholders`. It only fills in missing files; `-- --force handover` redraws just the ones you name, and `-- --force` on its own overwrites everything, real photos included.
+To go back to the generated placeholders: `npm run images:placeholders`. It only fills in missing files; `-- --force handover` redraws just the ones you name, and `-- --force` on its own overwrites everything, real photos included.
 
 ### Calibrate the "Under the lens" hotspots
 
-The magnifier visits hotspots defined as fractions of the photo (`x`, `y` in `site.lens.kinds[].checkpoints`). After adding `lens-car` and `lens-bike`:
+The magnifier visits hotspots defined as fractions of the photo (`x`, `y` in `site.lens.kinds[].checkpoints`). They are calibrated for the current car and bike photos. After replacing `lens-car` or `lens-bike`:
 
 1. `npm run dev` and open **http://localhost:3000/?hotspots** (this helper only exists in development).
 2. Scroll to "Under the lens" and click the spot on the photo where a checkpoint should sit. The coordinates appear in the corner and in the browser console.
@@ -102,6 +106,7 @@ Everything below is a placeholder or an assumption in the current build:
 14. **What "AC" in @autolensac stands for.**
 15. **Production domain.** Set `siteUrl` in `content/site.ts`; on Vercel the production URL is detected automatically.
 16. **Are they independent of dealerships?** A strong selling point if true; not claimed anywhere yet.
+17. **Photography.** All photos are AI-generated stand-ins (the inspector, cars, bike and showrooms). Swap in real shoots of the AutoLens team and inspections when available, using the same file names.
 
 ---
 
@@ -122,6 +127,8 @@ Everything below is a placeholder or an assumption in the current build:
   - The Problem column only sticks on screens at least 820px tall; the Why photo is capped to the screen height.
   - Space between sections scales with the screen height (`section-y-*` in `app/globals.css`): identical on normal screens, tighter on short ones, so a gap never fills most of the screen.
   - Checked with real wheel scrolling (dev and production builds) at 1280×577, 1366×657, 1536×730, 1440×900, 1920×969, 1024×600, 1180×820, 768×1024, 390×664, 360×640, 844×390 and 932×430.
+- **Photos are fitted, never force-cropped.** The generated photos came in mixed shapes (16:9, 2:1, 4:5), so the export script keeps each whole photo and only extends a backdrop where a slot needs room. The hero is art-directed by shape: the wide shot on landscape screens from 768px, the portrait shot on phones and portrait tablets.
+- **The share card is a JPEG (about 95 KB).** With a real photo the generated PNG was about 800 KB, and WhatsApp skips link-preview images much over 300 KB. It's still rendered from code at build time.
 - **One booking label everywhere:** "Book your PDI" (the brief suggested "Book PDI" for the nav).
 - **Testimonials** are visible with obvious "Placeholder" tags so the client sees the design. Switch them off with `testimonials.enabled`.
 - **Cursor follower:** contextual, desktop mouse only, never replaces the system cursor, off under reduced motion, and can be switched off.
